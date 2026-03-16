@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>horse</title>
+    <link rel="icon" type="image/png" href="img/Icon.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+            font-family: 'Nunito', sans-serif;
+            color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-transform: lowercase; 
+        }
+
+        .bg-blur {
+            position: fixed;
+            top: -5%; left: -5%;
+            width: 110%; height: 110%;
+            background-image: url('img/horserace/horserace.png');
+            background-size: cover;
+            background-position: center;
+            filter: blur(6px) saturate(1.2);
+            z-index: -1;
+        }
+
+        .uma-box {
+            background-color: #f7f9fa;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 2px solid #e1e5e8;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .creator-container { width: 400px; }
+        .name-modal { width: 300px; position: absolute; z-index: 100; display: none; }
+        
+        .pasture-ui { 
+            position: absolute; 
+            top: 10px; 
+            left: 10px; 
+            display: none; 
+            z-index: 100;
+        }
+
+        .uma-header {
+            background-color: #8cc63f; 
+            padding: 15px;
+            text-align: center;
+            border-bottom: 3px solid #77a833;
+        }
+
+        .uma-header h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 900;
+            text-shadow: 1px 1px 0px #5c8a22;
+            letter-spacing: 1px;
+        }
+
+        .uma-body {
+            padding: 20px;
+            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 10px, transparent 10px, transparent 20px);
+        }
+
+        .horse-preview {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            margin: 0 auto 20px auto;
+            background: linear-gradient(to bottom, #87ceeb 0%, #87ceeb 60%, #90ee90 60%, #90ee90 100%);
+            border-radius: 12px;
+            border: 2px solid #d1d8dc;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .layer {
+            position: absolute;
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .control-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            border: 2px solid #d1d8dc;
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .control-group label { font-size: 15px; font-weight: 800; color: #555; }
+
+        input[type="color"] {
+            border: none; background: none; cursor: pointer;
+            width: 40px; height: 40px; padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 3px solid #d1d8dc; border-radius: 50%; }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #d1d8dc;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            text-transform: lowercase;
+        }
+        input[type="text"]:focus { border-color: #8cc63f; }
+
+        .btn-save {
+            background-color: #8cc63f; 
+            color: #ffffff;
+            font-family: 'Nunito', sans-serif;
+            border: 3px solid #ffffff;
+            padding: 12px 20px;
+            font-size: 18px;
+            font-weight: 900;
+            width: 100%;
+            border-radius: 30px;
+            margin-top: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0px #5c8a22, 0 8px 10px rgba(0,0,0,0.1);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .btn-save:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0px #5c8a22, 0 4px 5px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background-color: #ff6b81;
+            box-shadow: 0 4px 0px #d63031, 0 8px 10px rgba(0,0,0,0.1);
+        }
+        .btn-secondary:active { box-shadow: 0 0px 0px #d63031; }
+
+        .btn-small { 
+            width: auto; 
+            display: inline-block; 
+            margin-right: 5px; 
+            padding: 5px 12px; 
+            font-size: 13px; 
+            text-decoration: none;
+        }
+
+        #pasture-area {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 200px;
+            display: none;
+            pointer-events: none; 
+        }
+
+        .horse-sprite {
+            position: absolute;
+            bottom: -32px; 
+            width: 230px; 
+            height: 230px;
+            pointer-events: auto; 
+            cursor: pointer;
+        }
+
+        .horse-images {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        .horse-name {
+            position: absolute;
+            top: 15px; 
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 900;
+            opacity: 0; 
+            transition: opacity 0.2s;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .horse-sprite:hover .horse-name {
+            opacity: 1; 
+        }
+    </style>
+</head>
+<body>
+
+    <svg width="0" height="0" style="position:absolute;">
+        <filter id="tint-fur"><feFlood flood-color="#ffffff" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
+        <filter id="tint-hair"><feFlood flood-color="#ff9f43" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
+        <filter id="tint-nose"><feFlood flood-color="#ffb6c1" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
+    </svg>
+
+    <div class="bg-blur"></div>
+
+    <div class="uma-box creator-container" id="creator-view">
+        <div class="uma-header">
+            <h2>horse maker</h2>
+        </div>
+        <div class="uma-body">
+            <div class="horse-preview">
+                <img src="img/horserace/horse/horse_basecolor.png" class="layer" style="filter: url(#tint-fur);">
+                <img src="img/horserace/horse/horse_eyewhite.png" class="layer">
+                <img src="img/horserace/horse/horse_baseoutline.png" class="layer">
+                <img src="img/horserace/horse/horse_earcolor.png" class="layer" style="filter: url(#tint-fur);">
+                <img src="img/horserace/horse/horse_earoutline.png" class="layer">
+                <img src="img/horserace/horse/horse_haircolor.png" class="layer" style="filter: url(#tint-hair);">
+                <img src="img/horserace/horse/horse_hairoutline.png" class="layer">
+                <img src="img/horserace/horse/horse_nosecolor.png" class="layer" style="filter: url(#tint-nose);">
+            </div>
+
+            <div class="control-group">
+                <label>fur color</label>
+                <input type="color" id="input-fur" value="#ffffff">
+            </div>
+            <div class="control-group">
+                <label>hair color</label>
+                <input type="color" id="input-hair" value="#ff9f43">
+            </div>
+            <div class="control-group">
+                <label>nose color</label>
+                <input type="color" id="input-nose" value="#ffb6c1">
+            </div>
+
+            <button class="btn-save" onclick="openNameModal()">to the race!</button>
+        </div>
+    </div>
+
+    <div class="uma-box name-modal" id="name-modal">
+        <div class="uma-header">
+            <h2>name your horse</h2>
+        </div>
+        <div class="uma-body" style="text-align: center;">
+            <input type="text" id="input-name" placeholder="e.g. silly star" maxlength="15">
+            <button class="btn-save" onclick="confirmAndSaveHorse()">confirm</button>
+            <button class="btn-save btn-secondary" style="margin-top: 10px;" onclick="closeNameModal()">cancel</button>
+        </div>
+    </div>
+
+    <div class="pasture-ui" id="pasture-ui">
+        <a href="/" class="btn-save btn-secondary btn-small">←</a>
+        <button class="btn-save btn-small" onclick="editHorse()">edit</button>
+    </div>
+
+    <div id="pasture-area"></div>
+
+    <script>
+        const supabaseUrl = 'https://qtthshswzfssdohtjrif.supabase.co'; 
+        const supabaseKey = 'sb_publishable_ix2Ku1eSUTgQhRn1vg_N6g_QO8tFRwp';
+        const db = supabase.createClient(supabaseUrl, supabaseKey);
+
+        var creatorView = document.getElementById('creator-view');
+        var nameModal = document.getElementById('name-modal');
+        var pastureUI = document.getElementById('pasture-ui');
+        var pastureArea = document.getElementById('pasture-area');
+        
+        var inFur = document.getElementById('input-fur');
+        var inHair = document.getElementById('input-hair');
+        var inNose = document.getElementById('input-nose');
+        var inName = document.getElementById('input-name');
+
+        var currentHorseData = null;
+
+        var savedHorse = localStorage.getItem('mySillyHorse');
+        if (savedHorse) {
+            currentHorseData = JSON.parse(savedHorse);
+            inFur.value = currentHorseData.fur;
+            inHair.value = currentHorseData.hair;
+            inNose.value = currentHorseData.nose;
+            inName.value = currentHorseData.name;
+            loadPasture();
+        }
+
+        inFur.addEventListener('input', applyCreatorColors);
+        inHair.addEventListener('input', applyCreatorColors);
+        inNose.addEventListener('input', applyCreatorColors);
+
+        function applyCreatorColors() {
+            document.querySelector('#tint-fur feFlood').setAttribute('flood-color', inFur.value);
+            document.querySelector('#tint-hair feFlood').setAttribute('flood-color', inHair.value);
+            document.querySelector('#tint-nose feFlood').setAttribute('flood-color', inNose.value);
+        }
+        applyCreatorColors();
+
+        function openNameModal() {
+            creatorView.style.pointerEvents = "none";
+            creatorView.style.opacity = "0.5";
+            nameModal.style.display = "block";
+        }
+
+        function closeNameModal() {
+            creatorView.style.pointerEvents = "auto";
+            creatorView.style.opacity = "1";
+            nameModal.style.display = "none";
+        }
+
+        async function confirmAndSaveHorse() {
+            if (inName.value.trim() === "") {
+                alert("please give your horse a name!");
+                return;
+            }
+
+            let myId = localStorage.getItem('myHorseId');
+            if (!myId) {
+                myId = crypto.randomUUID ? crypto.randomUUID() : 'id-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('myHorseId', myId);
+            }
+
+            currentHorseData = {
+                id: myId,
+                name: inName.value,
+                fur: inFur.value,
+                hair: inHair.value,
+                nose: inNose.value
+            };
+            
+            localStorage.setItem('mySillyHorse', JSON.stringify(currentHorseData));
+            
+            const { data, error } = await db.from('horses').upsert([currentHorseData]);
+            
+            if (error) {
+                console.error(error);
+                alert("error saving to the cloud! check console.");
+                return;
+            }
+
+            closeNameModal();
+            loadPasture();
+        }
+
+        function editHorse() {
+            pastureUI.style.display = "none";
+            pastureArea.style.display = "none";
+            pastureArea.innerHTML = ""; 
+            creatorView.style.display = "block";
+        }
+
+        async function loadPasture() {
+            creatorView.style.display = "none";
+            pastureUI.style.display = "block";
+            pastureArea.style.display = "block";
+            pastureArea.innerHTML = ""; 
+
+            const { data: allHorses, error } = await db.from('horses').select('*');
+
+            if (error) {
+                console.error(error);
+                alert("could not load horses from the cloud.");
+                return;
+            }
+
+            if (allHorses) {
+                allHorses.forEach(function(horse) {
+                    renderHorseToPasture(horse);
+                });
+            }
+        }
+
+        function renderHorseToPasture(horse) {
+            var dynamicSVG = `
+                <svg width="0" height="0" style="position:absolute;">
+                    <filter id="tint-fur-${horse.id}"><feFlood flood-color="${horse.fur}" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
+                    <filter id="tint-hair-${horse.id}"><feFlood flood-color="${horse.hair}" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
+                    <filter id="tint-nose-${horse.id}"><feFlood flood-color="${horse.nose}" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
+                </svg>
+            `;
+
+            var startPosition = Math.floor(Math.random() * 80); 
+
+            var horseHTML = `
+                <div class="horse-sprite" id="sprite-${horse.id}" style="left: ${startPosition}vw;">
+                    <div class="horse-name">${horse.name}</div>
+                    <div class="horse-images">
+                        <img src="img/horserace/horse/horse_basecolor.png" class="layer" style="filter: url(#tint-fur-${horse.id});">
+                        <img src="img/horserace/horse/horse_eyewhite.png" class="layer">
+                        <img src="img/horserace/horse/horse_baseoutline.png" class="layer">
+                        <img src="img/horserace/horse/horse_earcolor.png" class="layer" style="filter: url(#tint-fur-${horse.id});">
+                        <img src="img/horserace/horse/horse_earoutline.png" class="layer">
+                        <img src="img/horserace/horse/horse_haircolor.png" class="layer" style="filter: url(#tint-hair-${horse.id});">
+                        <img src="img/horserace/horse/horse_hairoutline.png" class="layer">
+                        <img src="img/horserace/horse/horse_nosecolor.png" class="layer" style="filter: url(#tint-nose-${horse.id});">
+                    </div>
+                </div>
+            `;
+
+            pastureArea.innerHTML += dynamicSVG + horseHTML;
+        }
+
+        setInterval(function() {
+            if (pastureArea.style.display !== "block") return; 
+
+            var allHorses = document.querySelectorAll('.horse-sprite');
+            allHorses.forEach(function(sprite) {
+                if (Math.random() < 0.5) {
+                    var currentLeft = parseFloat(sprite.style.left) || 50;
+                    
+                    var distance = (Math.random() * 35 + 25);
+                    var direction = Math.random() < 0.5 ? 1 : -1;
+                    var newLeft = currentLeft + (distance * direction);
+                    
+                    if (newLeft < 5) newLeft = 5 + Math.random() * 10;
+                    if (newLeft > 80) newLeft = 80 - Math.random() * 10;
+
+                    var horseImages = sprite.querySelector('.horse-images');
+                    if (newLeft > currentLeft) {
+                        horseImages.style.transform = "scaleX(1)";
+                    } else {
+                        horseImages.style.transform = "scaleX(-1)";
+                    }
+
+                    var walkTime = Math.abs(newLeft - currentLeft) / 8; 
+                    sprite.style.transition = "left " + walkTime + "s linear";
+                    sprite.style.left = newLeft + "vw";
+                }
+            });
+        }, 4000); 
+
+    </script>
+
+</body>
+</html>
