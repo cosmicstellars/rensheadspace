@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>silly derby maker!</title>
+    <title>horse</title>
     <link rel="icon" type="image/png" href="/img/Icon.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
@@ -175,7 +175,7 @@
 
         .horse-sprite {
             position: absolute;
-            bottom: -32px; 
+            /* bottom is now set dynamically in javascript so they have 3d depth! */
             width: 230px; 
             height: 230px;
             pointer-events: auto; 
@@ -202,7 +202,6 @@
             font-weight: 900;
             white-space: nowrap;
             z-index: 10;
-            /* opacity logic removed so it is always visible! */
         }
     </style>
 </head>
@@ -389,7 +388,6 @@
             `;
 
             var startPosition = Math.floor(Math.random() * 80); 
-            // 50/50 chance to face left or right when spawning!
             var startFacing = Math.random() < 0.5 ? 1 : -1;
 
             var horseHTML = `
@@ -410,39 +408,44 @@
 
             pastureArea.innerHTML += dynamicSVG + horseHTML;
             
-            // wait a tiny bit for the browser to render the div, then give this specific horse its brain!
             setTimeout(function() {
                 var newSprite = document.getElementById('sprite-' + horse.id);
-                if (newSprite) startHorseBrain(newSprite);
+                if (newSprite) {
+                    // pseudo-3d depth generation! (-45px to -15px)
+                    var depth = Math.random() * 30 - 45; 
+                    newSprite.style.bottom = depth + "px";
+                    // horses closer to the bottom get a higher z-index so they cover horses behind them!
+                    newSprite.style.zIndex = Math.floor(depth * -1); 
+                    
+                    startHorseBrain(newSprite);
+                }
             }, 100);
         }
 
-        // --- THE NEW INDEPENDENT HORSE BRAIN ---
+        // --- THE UPGRADED HORSE BRAIN ---
         function startHorseBrain(sprite) {
             function decideNextMove() {
-                // stop thinking if the user goes back to the editor
                 if (!document.body.contains(sprite) || pastureArea.style.display !== "block") {
                     setTimeout(decideNextMove, 1000);
                     return;
                 }
 
-                // 30% chance the horse decides to just chill and eat grass for a bit
-                if (Math.random() < 0.3) {
-                    var napTime = Math.random() * 3000 + 2000; // sleep 2 to 5 seconds
+                // huge 60% chance to just chill, eat grass, and look cute
+                if (Math.random() < 0.6) {
+                    var napTime = Math.random() * 5000 + 3000; // nap for 3 to 8 seconds
                     setTimeout(decideNextMove, napTime);
                     return;
                 }
 
                 var currentLeft = parseFloat(sprite.style.left) || 50;
                 
-                // random walk distance (between 10 and 40vw)
-                var distance = (Math.random() * 30 + 10);
+                // shorter, calmer walk distances (10vw to 25vw)
+                var distance = (Math.random() * 15 + 10);
                 var direction = Math.random() < 0.5 ? 1 : -1;
                 var newLeft = currentLeft + (distance * direction);
                 
-                // keep them from walking off the screen
-                if (newLeft < 5) newLeft = 5 + Math.random() * 10;
-                if (newLeft > 80) newLeft = 80 - Math.random() * 10;
+                if (newLeft < 5) newLeft = 5 + Math.random() * 5;
+                if (newLeft > 80) newLeft = 80 - Math.random() * 5;
 
                 var horseImages = sprite.querySelector('.horse-images');
                 if (newLeft > currentLeft) {
@@ -451,19 +454,19 @@
                     horseImages.style.transform = "scaleX(-1)";
                 }
 
-                // vary the speed! some horses trot, some walk slow
-                var speedMultiplier = Math.random() * 0.7 + 0.8; 
-                var walkTime = (Math.abs(newLeft - currentLeft) / 8) * speedMultiplier; 
+                // strict, realistic speed constraint: exactly 0.3 seconds per 1vw traveled. 
+                // no more racecars!
+                var walkTime = Math.abs(newLeft - currentLeft) * 0.3; 
                 
                 sprite.style.transition = "left " + walkTime + "s linear";
                 sprite.style.left = newLeft + "vw";
 
-                // wait exactly until the walk is finished, plus a tiny buffer, before thinking again
-                setTimeout(decideNextMove, (walkTime * 1000) + (Math.random() * 1000 + 500));
+                // wait for the exact walk time to finish, plus a guaranteed 2 second rest before thinking again
+                setTimeout(decideNextMove, (walkTime * 1000) + 2000);
             }
 
-            // start the first thought after a random delay so they don't all move at once
-            setTimeout(decideNextMove, Math.random() * 3000);
+            // scatter their first thoughts so they don't all start doing things instantly
+            setTimeout(decideNextMove, Math.random() * 4000);
         }
 
     </script>
