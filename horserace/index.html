@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>horse</title>
+    <title>silly derby maker!</title>
     <link rel="icon" type="image/png" href="/img/Icon.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
@@ -200,14 +200,9 @@
             border-radius: 10px;
             font-size: 14px;
             font-weight: 900;
-            opacity: 0; 
-            transition: opacity 0.2s;
             white-space: nowrap;
             z-index: 10;
-        }
-
-        .horse-sprite:hover .horse-name {
-            opacity: 1; 
+            /* opacity logic removed so it is always visible! */
         }
     </style>
 </head>
@@ -344,7 +339,7 @@
             
             localStorage.setItem('mySillyHorse', JSON.stringify(currentHorseData));
             
-            const { data, error } = await db.from('horses').upsert([currentHorseData]);
+            const { data, error } = await db.from('horses').upsert([currentHorseData], { onConflict: 'id' });
             
             if (error) {
                 console.error(error);
@@ -394,11 +389,13 @@
             `;
 
             var startPosition = Math.floor(Math.random() * 80); 
+            // 50/50 chance to face left or right when spawning!
+            var startFacing = Math.random() < 0.5 ? 1 : -1;
 
             var horseHTML = `
                 <div class="horse-sprite" id="sprite-${horse.id}" style="left: ${startPosition}vw;">
                     <div class="horse-name">${horse.name}</div>
-                    <div class="horse-images">
+                    <div class="horse-images" style="transform: scaleX(${startFacing});">
                         <img src="/img/horserace/horse/horse_basecolor.png" class="layer" style="filter: url(#tint-fur-${horse.id});">
                         <img src="/img/horserace/horse/horse_eyewhite.png" class="layer">
                         <img src="/img/horserace/horse/horse_baseoutline.png" class="layer">
@@ -412,36 +409,62 @@
             `;
 
             pastureArea.innerHTML += dynamicSVG + horseHTML;
+            
+            // wait a tiny bit for the browser to render the div, then give this specific horse its brain!
+            setTimeout(function() {
+                var newSprite = document.getElementById('sprite-' + horse.id);
+                if (newSprite) startHorseBrain(newSprite);
+            }, 100);
         }
 
-        setInterval(function() {
-            if (pastureArea.style.display !== "block") return; 
-
-            var allHorses = document.querySelectorAll('.horse-sprite');
-            allHorses.forEach(function(sprite) {
-                if (Math.random() < 0.5) {
-                    var currentLeft = parseFloat(sprite.style.left) || 50;
-                    
-                    var distance = (Math.random() * 35 + 25);
-                    var direction = Math.random() < 0.5 ? 1 : -1;
-                    var newLeft = currentLeft + (distance * direction);
-                    
-                    if (newLeft < 5) newLeft = 5 + Math.random() * 10;
-                    if (newLeft > 80) newLeft = 80 - Math.random() * 10;
-
-                    var horseImages = sprite.querySelector('.horse-images');
-                    if (newLeft > currentLeft) {
-                        horseImages.style.transform = "scaleX(1)";
-                    } else {
-                        horseImages.style.transform = "scaleX(-1)";
-                    }
-
-                    var walkTime = Math.abs(newLeft - currentLeft) / 8; 
-                    sprite.style.transition = "left " + walkTime + "s linear";
-                    sprite.style.left = newLeft + "vw";
+        // --- THE NEW INDEPENDENT HORSE BRAIN ---
+        function startHorseBrain(sprite) {
+            function decideNextMove() {
+                // stop thinking if the user goes back to the editor
+                if (!document.body.contains(sprite) || pastureArea.style.display !== "block") {
+                    setTimeout(decideNextMove, 1000);
+                    return;
                 }
-            });
-        }, 4000); 
+
+                // 30% chance the horse decides to just chill and eat grass for a bit
+                if (Math.random() < 0.3) {
+                    var napTime = Math.random() * 3000 + 2000; // sleep 2 to 5 seconds
+                    setTimeout(decideNextMove, napTime);
+                    return;
+                }
+
+                var currentLeft = parseFloat(sprite.style.left) || 50;
+                
+                // random walk distance (between 10 and 40vw)
+                var distance = (Math.random() * 30 + 10);
+                var direction = Math.random() < 0.5 ? 1 : -1;
+                var newLeft = currentLeft + (distance * direction);
+                
+                // keep them from walking off the screen
+                if (newLeft < 5) newLeft = 5 + Math.random() * 10;
+                if (newLeft > 80) newLeft = 80 - Math.random() * 10;
+
+                var horseImages = sprite.querySelector('.horse-images');
+                if (newLeft > currentLeft) {
+                    horseImages.style.transform = "scaleX(1)";
+                } else {
+                    horseImages.style.transform = "scaleX(-1)";
+                }
+
+                // vary the speed! some horses trot, some walk slow
+                var speedMultiplier = Math.random() * 0.7 + 0.8; 
+                var walkTime = (Math.abs(newLeft - currentLeft) / 8) * speedMultiplier; 
+                
+                sprite.style.transition = "left " + walkTime + "s linear";
+                sprite.style.left = newLeft + "vw";
+
+                // wait exactly until the walk is finished, plus a tiny buffer, before thinking again
+                setTimeout(decideNextMove, (walkTime * 1000) + (Math.random() * 1000 + 500));
+            }
+
+            // start the first thought after a random delay so they don't all move at once
+            setTimeout(decideNextMove, Math.random() * 3000);
+        }
 
     </script>
 
