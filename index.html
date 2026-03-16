@@ -6,170 +6,10 @@
     <title>ren's headspace</title>
     
     <link rel="stylesheet" href="https://cdn.cursors-4u.net/cursors/animated/shiny-grey-star-4a7c7422-32.css">
-    
-    <style>
-        /* --- Deep Slate Blue Space Reset --- */
-        body {
-            background-color: #0b0b14;
-            background-image: radial-gradient(circle at center, #1e1d30 0%, #0b0b14 100%);
-            color: #d0d0e6;
-            font-family: Verdana, Tahoma, sans-serif;
-            font-size: 11px;
-            margin: 0;
-            padding: 0; 
-            overflow-x: hidden;
-        }
-
-        a { color: #8e8cf0; text-decoration: none; font-weight: bold; }
-        a:hover { color: #fff; background-color: #8e8cf0; text-decoration: none; cursor: help; }
-
-        /* --- Blinking Background Stars --- */
-        #star-field {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .bg-star {
-            position: absolute;
-            background-color: #fff;
-            border-radius: 50%;
-            animation: twinkle infinite alternate;
-        }
-
-        @keyframes twinkle {
-            0% { opacity: 0.1; transform: scale(0.5); }
-            100% { opacity: 0.8; transform: scale(1.2); box-shadow: 0 0 4px #fff; }
-        }
-
-        /* --- Classic MySpace-Style Layout Container --- */
-        .wrapper {
-            width: 750px;
-            margin: 0 auto;
-            min-height: 100vh; 
-            background-color: rgba(15, 15, 25, 0.8);
-            border-left: 1px dotted #5c5a8a;
-            border-right: 1px dotted #5c5a8a;
-            padding: 30px 20px; 
-            box-sizing: border-box;
-            z-index: 10;
-            position: relative;
-        }
-
-        /* --- Header --- */
-        .header {
-            text-align: center;
-            border-bottom: 1px dashed #48476e;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            color: #c4c3f5;
-            letter-spacing: 3px;
-            text-shadow: 0 0 8px #5c5a8a;
-            margin: 5px 0;
-            font-weight: normal;
-        }
-
-        /* --- Navigation --- */
-        .nav-bar {
-            text-align: center;
-            margin-bottom: 30px;
-            word-spacing: 15px;
-        }
-        .nav-bar a { font-size: 12px; }
-
-        /* --- 2-Column Layout --- */
-        .columns {
-            display: flex;
-            gap: 20px;
-        }
-
-        /* Left Column (Sidebar) */
-        .left-col {
-            width: 220px;
-        }
-
-        .box {
-            background-color: rgba(51, 50, 82, 0.6); 
-            border: 1px solid #48476e;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-
-        .box-title {
-            background-color: #5c5a8a;
-            color: #0b0b14;
-            font-weight: bold;
-            padding: 2px 5px;
-            margin: -10px -10px 10px -10px;
-            font-size: 10px;
-            text-transform: uppercase;
-        }
-
-        .profile-img {
-            width: 100%;
-            height: 180px;
-            border: 1px dotted #5c5a8a;
-            background-image: url('img/Pic.png');
-            background-size: cover;
-            background-position: center;
-            margin-bottom: 10px;
-        }
-
-        /* Right Column (Blog Feed) */
-        .right-col {
-            width: 480px; 
-        }
-
-        .blog-entry {
-            margin-bottom: 25px;
-        }
-        
-        .blog-header {
-            border-bottom: 1px dotted #48476e;
-            padding-bottom: 3px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .blog-title {
-            font-weight: bold;
-            font-size: 14px;
-            color: #c4c3f5;
-        }
-        
-        .blog-date {
-            color: #8382ad;
-        }
-
-        .blog-content {
-            line-height: 1.6;
-            text-align: justify;
-        }
-
-        /* --- Star Mouse Trail --- */
-        .trail-particle {
-            position: absolute;
-            width: 12px; 
-            height: 12px;
-            pointer-events: none; 
-            z-index: 9999;
-            transform: translate(-50%, -50%) scale(1);
-            transition: transform 0.6s linear, opacity 0.6s linear;
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            filter: drop-shadow(0 0 3px #c4c3f5);
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
-<body>
+<body hx-boost="true">
 
     <div id="star-field"></div>
 
@@ -180,9 +20,9 @@
         </div>
 
         <div class="nav-bar">
-            [ <a href="index.html">home</a> ] 
-            [ <a href="creations.html">creations</a> ] 
-            [ <a href="projects.html">projects</a> ] 
+            [ <a href="/">home</a> ] 
+            [ <a href="/creations">creations</a> ] 
+            [ <a href="/projects">projects</a> ] 
             [ <a href="#">downloads</a> ]
         </div>
 
