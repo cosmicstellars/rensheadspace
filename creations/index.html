@@ -6,7 +6,7 @@
     <title>ren's headspace</title>
     
     <link rel="stylesheet" href="https://cdn.cursors-4u.net/cursors/animated/shiny-grey-star-4a7c7422-32.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 <body hx-boost="true">
@@ -34,83 +34,118 @@
             [ <a href="#">downloads</a> ]
         </div>
 
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="search database..." onkeyup="filterGallery()">
+        </div>
+
         <div class="gallery-container" id="gallery-feed">
-            <p style="text-align: center; color: #8382ad; margin-top: 50px;">loading creations...</p>
+            <p style="text-align: center; color: #cc99b3; margin-top: 50px;">loading creations...</p>
         </div>
     </div>
 
     <script>
-        const starField = document.getElementById('star-field');
-        for (let i = 0; i < 100; i++) {
-            let star = document.createElement('div');
-            star.className = 'bg-star';
-            star.style.left = Math.random() * 100 + 'vw';
-            star.style.top = Math.random() * 100 + 'vh';
-            let size = (Math.random() * 2 + 1) + 'px';
-            star.style.width = size; star.style.height = size;
-            star.style.animationDuration = (Math.random() * 3 + 1.5) + 's';
-            star.style.animationDelay = (Math.random() * 5) + 's';
-            starField.appendChild(star);
-        }
+        if (!window.effectsLoaded) {
+            window.effectsLoaded = true;
+            // The mouse trail and stars fall back here if someone loads /creations directly
+            var starField = document.getElementById('star-field');
+            if (starField) {
+                for (var i = 0; i < 100; i++) {
+                    var star = document.createElement('div');
+                    star.className = 'bg-star';
+                    star.style.left = Math.random() * 100 + 'vw';
+                    star.style.top = Math.random() * 100 + 'vh';
+                    var size = (Math.random() * 2 + 1) + 'px';
+                    star.style.width = size; star.style.height = size;
+                    star.style.animationDuration = (Math.random() * 3 + 1.5) + 's';
+                    star.style.animationDelay = (Math.random() * 5) + 's';
+                    starField.appendChild(star);
+                }
+            }
 
-        const colors = ['#ffffff', '#cccccc', '#8e8cf0', '#c4c3f5'];
-        let activeParticles = 0; let lastSpawn = 0;
-        document.addEventListener('mousemove', function(e) {
-            const now = Date.now();
-            if (now - lastSpawn < 30 || activeParticles > 30) return;
-            lastSpawn = now;
-            const particle = document.createElement('div');
-            particle.className = 'trail-particle';
-            particle.style.left = e.pageX + 'px'; particle.style.top = e.pageY + 'px';
-            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            document.body.appendChild(particle);
-            activeParticles++;
-            setTimeout(() => { particle.style.transform = 'translate(-50%, -50%) scale(0) translateY(20px) rotate(45deg)'; particle.style.opacity = '0'; }, 10);
-            setTimeout(() => { particle.remove(); activeParticles--; }, 600);
-        });
+            var colors = ['#ffffff', '#ffbde1', '#ff99c2', '#ff66a3'];
+            var activeParticles = 0;
+            var lastSpawn = 0;
+
+            document.addEventListener('mousemove', function(e) {
+                var now = Date.now();
+                if (now - lastSpawn < 30 || activeParticles > 30) return;
+                lastSpawn = now;
+                var particle = document.createElement('div');
+                particle.className = 'trail-particle';
+                particle.style.left = e.pageX + 'px'; particle.style.top = e.pageY + 'px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                document.body.appendChild(particle);
+                activeParticles++;
+                setTimeout(function() { particle.style.transform = 'translate(-50%, -50%) scale(0) translateY(20px) rotate(45deg)'; particle.style.opacity = '0'; }, 10);
+                setTimeout(function() { particle.remove(); activeParticles--; }, 600);
+            });
+        }
     </script>
 
-    <script src="creations.js"></script>
+    <script src="/creations.js"></script>
 
     <script>
-        const lightbox = document.getElementById('lightbox');
-        const lbImg = document.getElementById('lightbox-img');
-        const lbTitle = document.getElementById('lightbox-title');
-        const lbDesc = document.getElementById('lightbox-desc');
+        var lightbox = document.getElementById('lightbox');
+        var lbImg = document.getElementById('lightbox-img');
+        var lbTitle = document.getElementById('lightbox-title');
+        var lbDesc = document.getElementById('lightbox-desc');
+        var feedContainer = document.getElementById('gallery-feed');
 
-        function openLightbox(title, imgUrl, desc) {
+        // We attach these directly to the window so the HTML buttons can always find them
+        window.openLightbox = function(title, imgUrl, desc) {
             lbImg.src = imgUrl;
             lbTitle.innerText = title;
             lbDesc.innerText = desc;
             lightbox.style.display = 'flex';
-        }
+        };
 
-        function closeLightbox(event) {
+        window.closeLightbox = function(event) {
             if (event.target === lightbox || event.target.id === 'lightbox-close') {
                 lightbox.style.display = 'none';
             }
-        }
+        };
 
-        const feedContainer = document.getElementById('gallery-feed');
-        
-        if (typeof creationsData !== 'undefined') {
+        window.renderGallery = function(dataArray) {
+            if (!feedContainer) return;
+            if (dataArray.length === 0) {
+                feedContainer.innerHTML = '<p style="text-align: center; color: #cc99b3; margin-top: 50px;">no records found.</p>';
+                return;
+            }
+
             feedContainer.innerHTML = '<div class="gallery-grid" id="main-grid"></div>';
-            const grid = document.getElementById('main-grid');
+            var grid = document.getElementById('main-grid');
 
-            creationsData.forEach(item => {
-                const safeTitle = item.title.replace(/'/g, "\\'");
-                const safeImg = item.image.replace(/'/g, "\\'");
-                const safeDesc = item.description.replace(/'/g, "\\'");
+            dataArray.forEach(function(item) {
+                var safeTitle = item.title.replace(/'/g, "\\'");
+                var safeImg = item.image.replace(/'/g, "\\'");
+                var safeDesc = item.description.replace(/'/g, "\\'");
 
                 grid.innerHTML += `
-                    <div class="gallery-item" onclick="openLightbox('${safeTitle}', '${safeImg}', '${safeDesc}')">
+                    <div class="gallery-item" onclick="window.openLightbox('${safeTitle}', '${safeImg}', '${safeDesc}')">
                         <img src="${item.image}" class="gallery-thumb" alt="${item.title}">
                         <div class="gallery-title">${item.title}</div>
                     </div>
                 `;
             });
+        };
+
+        window.filterGallery = function() {
+            if (typeof creationsData === 'undefined') return;
+            var query = document.getElementById('search-bar').value.toLowerCase();
+            var filteredData = creationsData.filter(function(item) {
+                return item.title.toLowerCase().includes(query) || 
+                       item.description.toLowerCase().includes(query);
+            });
+            window.renderGallery(filteredData);
+        };
+
+        // Initial Page Load
+        if (typeof creationsData !== 'undefined') {
+            window.renderGallery(creationsData);
         } else {
-            feedContainer.innerHTML = '<p style="text-align: center; color: #ff9999;">Error: creations.js not found or formatted incorrectly.</p>';
+            if(feedContainer) {
+                feedContainer.innerHTML = '<p style="text-align: center; color: #ff9999;">Error: creations.js not found or formatted incorrectly.</p>';
+            }
         }
     </script>
 

@@ -6,7 +6,7 @@
     <title>ren's headspace</title>
     
     <link rel="stylesheet" href="https://cdn.cursors-4u.net/cursors/animated/shiny-grey-star-4a7c7422-32.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 <body hx-boost="true">
@@ -43,7 +43,7 @@
                     <div class="box-title">journal</div>
                     
                     <div id="blog-feed">
-                        <p style="text-align: center; color: #8382ad;">loading</p>
+                        <p style="text-align: center; color: #cc99b3;">loading</p>
                     </div>
 
                 </div>
@@ -53,86 +53,83 @@
     </div>
 
     <script>
-        // --- Generate Blinking Space Background ---
-        const starField = document.getElementById('star-field');
-        const starCount = 100;
+        // We wrap this in a lock so HTMX doesn't duplicate the trail when swapping pages
+        if (!window.effectsLoaded) {
+            window.effectsLoaded = true;
 
-        for (let i = 0; i < starCount; i++) {
-            let star = document.createElement('div');
-            star.className = 'bg-star';
-            
-            star.style.left = Math.random() * 100 + 'vw';
-            star.style.top = Math.random() * 100 + 'vh';
-            
-            let size = (Math.random() * 2 + 1) + 'px';
-            star.style.width = size;
-            star.style.height = size;
-            
-            star.style.animationDuration = (Math.random() * 3 + 1.5) + 's';
-            star.style.animationDelay = (Math.random() * 5) + 's';
-            
-            starField.appendChild(star);
+            var starField = document.getElementById('star-field');
+            if (starField) {
+                for (var i = 0; i < 100; i++) {
+                    var star = document.createElement('div');
+                    star.className = 'bg-star';
+                    star.style.left = Math.random() * 100 + 'vw';
+                    star.style.top = Math.random() * 100 + 'vh';
+                    var size = (Math.random() * 2 + 1) + 'px';
+                    star.style.width = size; star.style.height = size;
+                    star.style.animationDuration = (Math.random() * 3 + 1.5) + 's';
+                    star.style.animationDelay = (Math.random() * 5) + 's';
+                    starField.appendChild(star);
+                }
+            }
+
+            var colors = ['#ffffff', '#ffbde1', '#ff99c2', '#ff66a3'];
+            var activeParticles = 0;
+            var lastSpawn = 0;
+
+            document.addEventListener('mousemove', function(e) {
+                var now = Date.now();
+                if (now - lastSpawn < 30) return;
+                if (activeParticles > 30) return;
+                lastSpawn = now;
+
+                var particle = document.createElement('div');
+                particle.className = 'trail-particle';
+                
+                particle.style.left = e.pageX + 'px';
+                particle.style.top = e.pageY + 'px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                document.body.appendChild(particle);
+                activeParticles++;
+
+                setTimeout(function() {
+                    particle.style.transform = 'translate(-50%, -50%) scale(0) translateY(20px) rotate(45deg)';
+                    particle.style.opacity = '0';
+                }, 10);
+
+                setTimeout(function() {
+                    particle.remove();
+                    activeParticles--;
+                }, 600);
+            });
         }
-
-        // --- Dreamy Star Mouse Trail ---
-        const colors = ['#ffffff', '#cccccc', '#8e8cf0', '#c4c3f5'];
-        let activeParticles = 0;
-        let lastSpawn = 0;
-
-        document.addEventListener('mousemove', function(e) {
-            const now = Date.now();
-            if (now - lastSpawn < 30) return;
-            if (activeParticles > 30) return;
-            lastSpawn = now;
-
-            const particle = document.createElement('div');
-            particle.className = 'trail-particle';
-            
-            particle.style.left = e.pageX + 'px';
-            particle.style.top = e.pageY + 'px';
-            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            
-            document.body.appendChild(particle);
-            activeParticles++;
-
-            setTimeout(() => {
-                particle.style.transform = 'translate(-50%, -50%) scale(0) translateY(20px) rotate(45deg)';
-                particle.style.opacity = '0';
-            }, 10);
-
-            setTimeout(() => {
-                particle.remove();
-                activeParticles--;
-            }, 600);
-        });
     </script>
 
-    <script src="posts.js"></script>
+    <script src="/posts.js"></script>
 
     <script>
-        // Clear the "loading transmissions..." text
-        const feedContainer = document.getElementById('blog-feed');
-        feedContainer.innerHTML = '';
-        
-        // Loop through the blogPosts variable from your posts.js file
-        if (typeof blogPosts !== 'undefined') {
-            blogPosts.forEach(post => {
-                const postHTML = `
-                    <div class="blog-entry">
-                        <div class="blog-header">
-                            <span class="blog-title">${post.title}</span>
-                            <span class="blog-date">${post.date}</span>
+        var feedContainer = document.getElementById('blog-feed');
+        if (feedContainer) {
+            feedContainer.innerHTML = '';
+            
+            if (typeof blogPosts !== 'undefined') {
+                blogPosts.forEach(function(post) {
+                    var postHTML = `
+                        <div class="blog-entry">
+                            <div class="blog-header">
+                                <span class="blog-title">${post.title}</span>
+                                <span class="blog-date">${post.date}</span>
+                            </div>
+                            <div class="blog-content">
+                                ${post.content}
+                            </div>
                         </div>
-                        <div class="blog-content">
-                            ${post.content}
-                        </div>
-                    </div>
-                `;
-                // Inject the built HTML into the container
-                feedContainer.innerHTML += postHTML;
-            });
-        } else {
-            feedContainer.innerHTML = '<p style="text-align: center; color: #ff9999;">Error: posts.js not found or formatted incorrectly.</p>';
+                    `;
+                    feedContainer.innerHTML += postHTML;
+                });
+            } else {
+                feedContainer.innerHTML = '<p style="text-align: center; color: #ff9999;">Error: posts.js not found or formatted incorrectly.</p>';
+            }
         }
     </script>
 
