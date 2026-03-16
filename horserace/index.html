@@ -175,7 +175,7 @@
 
         .horse-sprite {
             position: absolute;
-            /* bottom is now set dynamically in javascript so they have 3d depth! */
+            bottom: -32px; /* back to sitting perfectly on the single flat line */
             width: 230px; 
             height: 230px;
             pointer-events: auto; 
@@ -411,12 +411,7 @@
             setTimeout(function() {
                 var newSprite = document.getElementById('sprite-' + horse.id);
                 if (newSprite) {
-                    // pseudo-3d depth generation! (-45px to -15px)
-                    var depth = Math.random() * 30 - 45; 
-                    newSprite.style.bottom = depth + "px";
-                    // horses closer to the bottom get a higher z-index so they cover horses behind them!
-                    newSprite.style.zIndex = Math.floor(depth * -1); 
-                    
+                    // removed the pseudo-3d depth and z-index math here!
                     startHorseBrain(newSprite);
                 }
             }, 100);
@@ -455,7 +450,6 @@
                 }
 
                 // strict, realistic speed constraint: exactly 0.3 seconds per 1vw traveled. 
-                // no more racecars!
                 var walkTime = Math.abs(newLeft - currentLeft) * 0.3; 
                 
                 sprite.style.transition = "left " + walkTime + "s linear";
