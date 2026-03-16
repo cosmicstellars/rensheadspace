@@ -2,7 +2,7 @@ var creationsData = [
     {
         "date": "03.09.2026",
         "title": "Kokona & Saki",
-        "image": "./img/creations/ren-KokonaSakiRender.png",
+        "image": "/img/creations/ren-KokonaSakiRender.png",
         "description": ""
     },
     {
@@ -14,7 +14,7 @@ var creationsData = [
     {
         "date": "12.25.2025",
         "title": "Christmas Render",
-        "image": "./img/creations/christmasRender_01.png",
+        "image": "/img/creations/christmasRender_01.png",
         "description": ""
     }
 ];
