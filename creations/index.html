@@ -6,7 +6,7 @@
     <title>creations - ren's headspace</title>
     
     <link rel="stylesheet" href="https://cdn.cursors-4u.net/cursors/animated/shiny-grey-star-4a7c7422-32.css">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/style.css?v=2">
 </head>
 <body>
 
@@ -34,7 +34,8 @@
         </div>
 
         <div class="search-container">
-            <input type="text" id="search-bar" placeholder="search database..." onkeyup="filterGallery()">
+            <span class="search-prompt">&gt;</span>
+            <input type="text" id="search-bar" placeholder="query database..." onkeyup="filterGallery()">
         </div>
 
         <div class="gallery-container" id="gallery-feed">
