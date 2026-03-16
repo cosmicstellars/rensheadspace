@@ -7,9 +7,8 @@
     
     <link rel="stylesheet" href="https://cdn.cursors-4u.net/cursors/animated/shiny-grey-star-4a7c7422-32.css">
     <link rel="stylesheet" href="/style.css">
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
-<body hx-boost="true">
+<body>
 
     <div id="star-field"></div>
 
@@ -43,7 +42,7 @@
                     <div class="box-title">journal</div>
                     
                     <div id="blog-feed">
-                        <p style="text-align: center; color: #cc99b3;">loading</p>
+                        <p style="text-align: center; color: #8382ad;">loading</p>
                     </div>
 
                 </div>
@@ -53,56 +52,50 @@
     </div>
 
     <script>
-        // We wrap this in a lock so HTMX doesn't duplicate the trail when swapping pages
-        if (!window.effectsLoaded) {
-            window.effectsLoaded = true;
-
-            var starField = document.getElementById('star-field');
-            if (starField) {
-                for (var i = 0; i < 100; i++) {
-                    var star = document.createElement('div');
-                    star.className = 'bg-star';
-                    star.style.left = Math.random() * 100 + 'vw';
-                    star.style.top = Math.random() * 100 + 'vh';
-                    var size = (Math.random() * 2 + 1) + 'px';
-                    star.style.width = size; star.style.height = size;
-                    star.style.animationDuration = (Math.random() * 3 + 1.5) + 's';
-                    star.style.animationDelay = (Math.random() * 5) + 's';
-                    starField.appendChild(star);
-                }
+        var starField = document.getElementById('star-field');
+        if (starField) {
+            for (var i = 0; i < 100; i++) {
+                var star = document.createElement('div');
+                star.className = 'bg-star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                var size = (Math.random() * 2 + 1) + 'px';
+                star.style.width = size; star.style.height = size;
+                star.style.animationDuration = (Math.random() * 3 + 1.5) + 's';
+                star.style.animationDelay = (Math.random() * 5) + 's';
+                starField.appendChild(star);
             }
-
-            var colors = ['#ffffff', '#ffbde1', '#ff99c2', '#ff66a3'];
-            var activeParticles = 0;
-            var lastSpawn = 0;
-
-            document.addEventListener('mousemove', function(e) {
-                var now = Date.now();
-                if (now - lastSpawn < 30) return;
-                if (activeParticles > 30) return;
-                lastSpawn = now;
-
-                var particle = document.createElement('div');
-                particle.className = 'trail-particle';
-                
-                particle.style.left = e.pageX + 'px';
-                particle.style.top = e.pageY + 'px';
-                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                document.body.appendChild(particle);
-                activeParticles++;
-
-                setTimeout(function() {
-                    particle.style.transform = 'translate(-50%, -50%) scale(0) translateY(20px) rotate(45deg)';
-                    particle.style.opacity = '0';
-                }, 10);
-
-                setTimeout(function() {
-                    particle.remove();
-                    activeParticles--;
-                }, 600);
-            });
         }
+
+        var colors = ['#ffffff', '#cccccc', '#8e8cf0', '#c4c3f5'];
+        var activeParticles = 0;
+        var lastSpawn = 0;
+
+        document.addEventListener('mousemove', function(e) {
+            var now = Date.now();
+            if (now - lastSpawn < 30 || activeParticles > 30) return;
+            lastSpawn = now;
+
+            var particle = document.createElement('div');
+            particle.className = 'trail-particle';
+            
+            particle.style.left = e.pageX + 'px';
+            particle.style.top = e.pageY + 'px';
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            document.body.appendChild(particle);
+            activeParticles++;
+
+            setTimeout(function() {
+                particle.style.transform = 'translate(-50%, -50%) scale(0) translateY(20px) rotate(45deg)';
+                particle.style.opacity = '0';
+            }, 10);
+
+            setTimeout(function() {
+                particle.remove();
+                activeParticles--;
+            }, 600);
+        });
     </script>
 
     <script src="/posts.js"></script>
