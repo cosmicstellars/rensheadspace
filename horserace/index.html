@@ -47,6 +47,13 @@
         .creator-container { width: 400px; }
         .name-modal { width: 300px; position: absolute; z-index: 100; display: none; }
         
+        .view-modal {
+            width: 360px;
+            position: absolute;
+            z-index: 200;
+            display: none;
+        }
+
         .pasture-ui { 
             position: absolute; 
             top: 10px; 
@@ -95,6 +102,22 @@
             object-fit: contain;
             pointer-events: none;
         }
+
+        .rank-badge {
+            position: absolute;
+            top: 10px; left: 10px;
+            background: #ffb8b8;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 900;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 20;
+        }
+
+        .rank-badge.gold { background: #ffcc00; }
 
         .control-group {
             display: flex;
@@ -156,6 +179,9 @@
         }
         .btn-secondary:active { box-shadow: 0 0px 0px #d63031; }
 
+        .btn-like { background-color: #ffa502; box-shadow: 0 4px 0px #e17000; }
+        .btn-like:active { box-shadow: 0 0px 0px #e17000; }
+
         .btn-small { 
             width: auto; 
             display: inline-block; 
@@ -175,11 +201,13 @@
 
         .horse-sprite {
             position: absolute;
-            bottom: -32px; /* back to sitting perfectly on the single flat line */
+            bottom: -32px; 
+            left: 0; /* base left is now 0, transform will handle positioning! */
             width: 230px; 
             height: 230px;
             pointer-events: auto; 
             cursor: pointer;
+            will-change: transform; /* hardware acceleration for smooth frames */
         }
 
         .horse-images {
@@ -187,6 +215,7 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             pointer-events: none;
+            will-change: transform; /* hardware acceleration for flipping */
         }
 
         .horse-name {
@@ -211,6 +240,12 @@
         <filter id="tint-fur"><feFlood flood-color="#ffffff" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
         <filter id="tint-hair"><feFlood flood-color="#ff9f43" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
         <filter id="tint-nose"><feFlood flood-color="#ffb6c1" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
+    </svg>
+
+    <svg width="0" height="0" style="position:absolute;">
+        <filter id="tint-fur-view"><feFlood flood-color="#ffffff" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
+        <filter id="tint-hair-view"><feFlood flood-color="#ff9f43" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
+        <filter id="tint-nose-view"><feFlood flood-color="#ffb6c1" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
     </svg>
 
     <div class="bg-blur"></div>
@@ -259,6 +294,31 @@
         </div>
     </div>
 
+    <div class="uma-box view-modal" id="view-modal">
+        <div class="uma-header">
+            <h2 id="view-title">horse name</h2>
+        </div>
+        <div class="uma-body" style="text-align: center;">
+            <div class="horse-preview">
+                <div class="rank-badge" id="view-rank">#1</div>
+                
+                <img src="/img/horserace/horse/horse_basecolor.png" class="layer" style="filter: url(#tint-fur-view);">
+                <img src="/img/horserace/horse/horse_eyewhite.png" class="layer">
+                <img src="/img/horserace/horse/horse_baseoutline.png" class="layer">
+                <img src="/img/horserace/horse/horse_earcolor.png" class="layer" style="filter: url(#tint-fur-view);">
+                <img src="/img/horserace/horse/horse_earoutline.png" class="layer">
+                <img src="/img/horserace/horse/horse_haircolor.png" class="layer" style="filter: url(#tint-hair-view);">
+                <img src="/img/horserace/horse/horse_hairoutline.png" class="layer">
+                <img src="/img/horserace/horse/horse_nosecolor.png" class="layer" style="filter: url(#tint-nose-view);">
+                
+                <img src="/img/horserace/horse/horse_crown.png" class="layer" id="view-crown" style="display: none; z-index: 5;">
+            </div>
+
+            <button class="btn-save btn-like" id="view-like-btn" onclick="likeViewedHorse()">like (0)</button>
+            <button class="btn-save btn-secondary" onclick="closeViewModal()">close window</button>
+        </div>
+    </div>
+
     <div class="pasture-ui" id="pasture-ui">
         <a href="/" class="btn-save btn-secondary btn-small">←</a>
         <button class="btn-save btn-small" onclick="editHorse()">edit</button>
@@ -273,6 +333,7 @@
 
         var creatorView = document.getElementById('creator-view');
         var nameModal = document.getElementById('name-modal');
+        var viewModal = document.getElementById('view-modal');
         var pastureUI = document.getElementById('pasture-ui');
         var pastureArea = document.getElementById('pasture-area');
         
@@ -282,6 +343,8 @@
         var inName = document.getElementById('input-name');
 
         var currentHorseData = null;
+        var loadedHorses = []; 
+        var horseBeingViewed = null; 
 
         var savedHorse = localStorage.getItem('mySillyHorse');
         if (savedHorse) {
@@ -367,18 +430,23 @@
 
             if (error) {
                 console.error(error);
-                alert("could not load horses from the cloud.");
                 return;
             }
 
             if (allHorses) {
-                allHorses.forEach(function(horse) {
-                    renderHorseToPasture(horse);
+                allHorses.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+                loadedHorses = allHorses; 
+                
+                // PERFORMANCE FIX: Only load the top 15 horses so the browser doesn't lag!
+                var topHorses = allHorses.slice(0, 15);
+
+                topHorses.forEach(function(horse, index) {
+                    renderHorseToPasture(horse, index + 1); 
                 });
             }
         }
 
-        function renderHorseToPasture(horse) {
+        function renderHorseToPasture(horse, rank) {
             var dynamicSVG = `
                 <svg width="0" height="0" style="position:absolute;">
                     <filter id="tint-fur-${horse.id}"><feFlood flood-color="${horse.fur}" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
@@ -390,8 +458,11 @@
             var startPosition = Math.floor(Math.random() * 80); 
             var startFacing = Math.random() < 0.5 ? 1 : -1;
 
+            var crownHTML = rank === 1 ? `<img src="/img/horserace/horse/horse_crown.png" class="layer" style="z-index: 5;">` : '';
+
+            // PERFORMANCE FIX: using transform to set position instead of left, and saving the position in data-x
             var horseHTML = `
-                <div class="horse-sprite" id="sprite-${horse.id}" style="left: ${startPosition}vw;">
+                <div class="horse-sprite" id="sprite-${horse.id}" style="transform: translateX(${startPosition}vw);" data-x="${startPosition}" onclick="openViewModal('${horse.id}', ${rank})">
                     <div class="horse-name">${horse.name}</div>
                     <div class="horse-images" style="transform: scaleX(${startFacing});">
                         <img src="/img/horserace/horse/horse_basecolor.png" class="layer" style="filter: url(#tint-fur-${horse.id});">
@@ -402,22 +473,87 @@
                         <img src="/img/horserace/horse/horse_haircolor.png" class="layer" style="filter: url(#tint-hair-${horse.id});">
                         <img src="/img/horserace/horse/horse_hairoutline.png" class="layer">
                         <img src="/img/horserace/horse/horse_nosecolor.png" class="layer" style="filter: url(#tint-nose-${horse.id});">
+                        ${crownHTML}
                     </div>
                 </div>
             `;
 
-            pastureArea.innerHTML += dynamicSVG + horseHTML;
+            // PERFORMANCE FIX: cleaner injection method that doesn't break existing horses
+            pastureArea.insertAdjacentHTML('beforeend', dynamicSVG + horseHTML);
             
             setTimeout(function() {
                 var newSprite = document.getElementById('sprite-' + horse.id);
                 if (newSprite) {
-                    // removed the pseudo-3d depth and z-index math here!
                     startHorseBrain(newSprite);
                 }
             }, 100);
         }
 
-        // --- THE UPGRADED HORSE BRAIN ---
+        function openViewModal(horseId, rank) {
+            horseBeingViewed = loadedHorses.find(h => h.id === horseId);
+            if (!horseBeingViewed) return;
+
+            document.getElementById('view-title').innerText = horseBeingViewed.name;
+            
+            document.querySelector('#tint-fur-view feFlood').setAttribute('flood-color', horseBeingViewed.fur);
+            document.querySelector('#tint-hair-view feFlood').setAttribute('flood-color', horseBeingViewed.hair);
+            document.querySelector('#tint-nose-view feFlood').setAttribute('flood-color', horseBeingViewed.nose);
+
+            var rankBadge = document.getElementById('view-rank');
+            rankBadge.innerText = "#" + rank;
+            if (rank === 1) {
+                rankBadge.classList.add('gold');
+                document.getElementById('view-crown').style.display = "block";
+            } else {
+                rankBadge.classList.remove('gold');
+                document.getElementById('view-crown').style.display = "none";
+            }
+
+            var likeBtn = document.getElementById('view-like-btn');
+            var currentLikes = horseBeingViewed.likes || 0;
+            
+            var likedStorage = JSON.parse(localStorage.getItem('likedHorses') || '[]');
+            if (likedStorage.includes(horseId)) {
+                likeBtn.innerText = "liked! (" + currentLikes + ")";
+                likeBtn.style.opacity = "0.5";
+                likeBtn.style.pointerEvents = "none";
+            } else {
+                likeBtn.innerText = "like (" + currentLikes + ")";
+                likeBtn.style.opacity = "1";
+                likeBtn.style.pointerEvents = "auto";
+            }
+
+            viewModal.style.display = "block";
+            pastureArea.style.opacity = "0.3"; 
+            pastureArea.style.pointerEvents = "none"; 
+        }
+
+        function closeViewModal() {
+            viewModal.style.display = "none";
+            pastureArea.style.opacity = "1";
+            pastureArea.style.pointerEvents = "auto";
+            horseBeingViewed = null;
+        }
+
+        async function likeViewedHorse() {
+            if (!horseBeingViewed) return;
+
+            var newLikes = (horseBeingViewed.likes || 0) + 1;
+            horseBeingViewed.likes = newLikes; 
+
+            var likeBtn = document.getElementById('view-like-btn');
+            likeBtn.innerText = "liked! (" + newLikes + ")";
+            likeBtn.style.opacity = "0.5";
+            likeBtn.style.pointerEvents = "none";
+
+            var likedStorage = JSON.parse(localStorage.getItem('likedHorses') || '[]');
+            likedStorage.push(horseBeingViewed.id);
+            localStorage.setItem('likedHorses', JSON.stringify(likedStorage));
+
+            await db.from('horses').update({ likes: newLikes }).eq('id', horseBeingViewed.id);
+        }
+
+        // --- GPU ACCELERATED HORSE BRAIN ---
         function startHorseBrain(sprite) {
             function decideNextMove() {
                 if (!document.body.contains(sprite) || pastureArea.style.display !== "block") {
@@ -425,16 +561,15 @@
                     return;
                 }
 
-                // huge 60% chance to just chill, eat grass, and look cute
                 if (Math.random() < 0.6) {
-                    var napTime = Math.random() * 5000 + 3000; // nap for 3 to 8 seconds
+                    var napTime = Math.random() * 5000 + 3000; 
                     setTimeout(decideNextMove, napTime);
                     return;
                 }
 
-                var currentLeft = parseFloat(sprite.style.left) || 50;
+                // PERFORMANCE FIX: getting the location from the data-x attribute instead of left
+                var currentLeft = parseFloat(sprite.getAttribute('data-x')) || 50;
                 
-                // shorter, calmer walk distances (10vw to 25vw)
                 var distance = (Math.random() * 15 + 10);
                 var direction = Math.random() < 0.5 ? 1 : -1;
                 var newLeft = currentLeft + (distance * direction);
@@ -449,17 +584,16 @@
                     horseImages.style.transform = "scaleX(-1)";
                 }
 
-                // strict, realistic speed constraint: exactly 0.3 seconds per 1vw traveled. 
                 var walkTime = Math.abs(newLeft - currentLeft) * 0.3; 
                 
-                sprite.style.transition = "left " + walkTime + "s linear";
-                sprite.style.left = newLeft + "vw";
+                // PERFORMANCE FIX: animating transform is butter smooth
+                sprite.setAttribute('data-x', newLeft);
+                sprite.style.transition = "transform " + walkTime + "s linear";
+                sprite.style.transform = "translateX(" + newLeft + "vw)";
 
-                // wait for the exact walk time to finish, plus a guaranteed 2 second rest before thinking again
                 setTimeout(decideNextMove, (walkTime * 1000) + 2000);
             }
 
-            // scatter their first thoughts so they don't all start doing things instantly
             setTimeout(decideNextMove, Math.random() * 4000);
         }
 
