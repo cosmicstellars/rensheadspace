@@ -40,18 +40,36 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             border: 2px solid #e1e5e8;
-            overflow: hidden;
             position: relative;
         }
 
-        .creator-container { width: 400px; }
-        .name-modal { width: 300px; position: absolute; z-index: 100; display: none; }
+        /* creator still hides overflow to keep the box clean */
+        .creator-container { 
+            width: 400px; 
+            overflow: hidden; 
+        }
         
+        .name-modal { 
+            width: 300px; 
+            position: absolute; 
+            z-index: 100; 
+            display: none; 
+            overflow: hidden; 
+        }
+        
+        /* view modal must have visible overflow so the x button can float outside! */
         .view-modal {
             width: 280px;
             position: absolute;
             z-index: 200;
             display: none;
+            overflow: visible; 
+        }
+
+        /* because overflow is visible, we manually round the header corners */
+        .view-modal .uma-header {
+            border-top-left-radius: 17px;
+            border-top-right-radius: 17px;
         }
 
         .pasture-ui { 
@@ -79,36 +97,40 @@
             letter-spacing: 1px;
         }
 
+        /* floating close button */
         .btn-close {
             position: absolute;
-            top: 12px;
-            left: 12px;
+            top: -15px;
+            left: -15px;
             background: #ff6b81;
             color: #ffffff;
-            border: 2px solid #ffffff;
+            border: 3px solid #ffffff;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            font-size: 14px;
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
             font-weight: 900;
             cursor: pointer;
-            box-shadow: 0 3px 0px #d63031;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2), 0 3px 0px #d63031;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10;
+            z-index: 300;
             font-family: 'Nunito', sans-serif;
             text-transform: lowercase;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
         .btn-close:active {
             transform: translateY(3px);
-            box-shadow: 0 0px 0px #d63031;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2), 0 0px 0px #d63031;
         }
 
         .uma-body {
             padding: 20px;
             background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 10px, transparent 10px, transparent 20px);
+            border-bottom-left-radius: 17px;
+            border-bottom-right-radius: 17px;
         }
 
         .horse-preview {
@@ -207,8 +229,15 @@
         }
         .btn-secondary:active { box-shadow: 0 0px 0px #d63031; }
 
-        .btn-like { background-color: #ffa502; box-shadow: 0 4px 0px #e17000; }
-        .btn-like:active { box-shadow: 0 0px 0px #e17000; }
+        /* like button is now smaller and centered! */
+        .btn-like { 
+            background-color: #f8c291; 
+            box-shadow: 0 4px 0px #e19551, 0 8px 10px rgba(0,0,0,0.1); 
+            width: auto;
+            padding: 8px 30px;
+            display: inline-block;
+        }
+        .btn-like:active { box-shadow: 0 0px 0px #e19551; }
 
         .btn-small { 
             width: auto; 
@@ -343,7 +372,7 @@
                 <img src="/img/horserace/horse/horse_crown.png" class="layer" id="view-crown" style="display: none; z-index: 5;">
             </div>
 
-            <button class="btn-save btn-like" id="view-like-btn" onclick="likeViewedHorse()">👍 0</button>
+            <button class="btn-save btn-like" id="view-like-btn" onclick="toggleLike()">👍 0</button>
         </div>
     </div>
 
@@ -538,14 +567,14 @@
             var currentLikes = horseBeingViewed.likes || 0;
             
             var likedStorage = JSON.parse(localStorage.getItem('likedHorses') || '[]');
+            
+            likeBtn.innerText = "👍 " + currentLikes;
+            
+            // if already liked, dim the button slightly but keep it clickable!
             if (likedStorage.includes(horseId)) {
-                likeBtn.innerText = "👍 " + currentLikes;
-                likeBtn.style.opacity = "0.5";
-                likeBtn.style.pointerEvents = "none";
+                likeBtn.style.opacity = "0.6";
             } else {
-                likeBtn.innerText = "👍 " + currentLikes;
                 likeBtn.style.opacity = "1";
-                likeBtn.style.pointerEvents = "auto";
             }
 
             viewModal.style.display = "block";
@@ -560,21 +589,33 @@
             horseBeingViewed = null;
         }
 
-        async function likeViewedHorse() {
+        // --- NEW TOGGLE LIKE LOGIC ---
+        async function toggleLike() {
             if (!horseBeingViewed) return;
 
-            var newLikes = (horseBeingViewed.likes || 0) + 1;
-            horseBeingViewed.likes = newLikes; 
-
-            var likeBtn = document.getElementById('view-like-btn');
-            likeBtn.innerText = "👍 " + newLikes;
-            likeBtn.style.opacity = "0.5";
-            likeBtn.style.pointerEvents = "none";
-
             var likedStorage = JSON.parse(localStorage.getItem('likedHorses') || '[]');
-            likedStorage.push(horseBeingViewed.id);
-            localStorage.setItem('likedHorses', JSON.stringify(likedStorage));
+            var isAlreadyLiked = likedStorage.includes(horseBeingViewed.id);
+            var currentLikes = horseBeingViewed.likes || 0;
+            var newLikes;
+            var likeBtn = document.getElementById('view-like-btn');
 
+            if (isAlreadyLiked) {
+                // UNLIKE IT
+                newLikes = Math.max(0, currentLikes - 1);
+                likedStorage = likedStorage.filter(id => id !== horseBeingViewed.id);
+                likeBtn.style.opacity = "1";
+            } else {
+                // LIKE IT
+                newLikes = currentLikes + 1;
+                likedStorage.push(horseBeingViewed.id);
+                likeBtn.style.opacity = "0.6";
+            }
+
+            horseBeingViewed.likes = newLikes; 
+            localStorage.setItem('likedHorses', JSON.stringify(likedStorage));
+            likeBtn.innerText = "👍 " + newLikes;
+
+            // push the update to supabase
             await db.from('horses').update({ likes: newLikes }).eq('id', horseBeingViewed.id);
         }
 
