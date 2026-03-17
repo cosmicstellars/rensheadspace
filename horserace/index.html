@@ -48,7 +48,7 @@
         .name-modal { width: 300px; position: absolute; z-index: 100; display: none; }
         
         .view-modal {
-            width: 360px;
+            width: 280px;
             position: absolute;
             z-index: 200;
             display: none;
@@ -67,6 +67,7 @@
             padding: 15px;
             text-align: center;
             border-bottom: 3px solid #77a833;
+            position: relative;
         }
 
         .uma-header h2 {
@@ -76,6 +77,33 @@
             font-weight: 900;
             text-shadow: 1px 1px 0px #5c8a22;
             letter-spacing: 1px;
+        }
+
+        .btn-close {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: #ff6b81;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 3px 0px #d63031;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            font-family: 'Nunito', sans-serif;
+            text-transform: lowercase;
+        }
+        .btn-close:active {
+            transform: translateY(3px);
+            box-shadow: 0 0px 0px #d63031;
         }
 
         .uma-body {
@@ -202,12 +230,12 @@
         .horse-sprite {
             position: absolute;
             bottom: -32px; 
-            left: 0; /* base left is now 0, transform will handle positioning! */
+            left: 0; 
             width: 230px; 
             height: 230px;
             pointer-events: auto; 
             cursor: pointer;
-            will-change: transform; /* hardware acceleration for smooth frames */
+            will-change: transform; 
         }
 
         .horse-images {
@@ -215,7 +243,7 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             pointer-events: none;
-            will-change: transform; /* hardware acceleration for flipping */
+            will-change: transform; 
         }
 
         .horse-name {
@@ -295,6 +323,7 @@
     </div>
 
     <div class="uma-box view-modal" id="view-modal">
+        <button class="btn-close" onclick="closeViewModal()">x</button>
         <div class="uma-header">
             <h2 id="view-title">horse name</h2>
         </div>
@@ -314,8 +343,7 @@
                 <img src="/img/horserace/horse/horse_crown.png" class="layer" id="view-crown" style="display: none; z-index: 5;">
             </div>
 
-            <button class="btn-save btn-like" id="view-like-btn" onclick="likeViewedHorse()">like (0)</button>
-            <button class="btn-save btn-secondary" onclick="closeViewModal()">close window</button>
+            <button class="btn-save btn-like" id="view-like-btn" onclick="likeViewedHorse()">👍 0</button>
         </div>
     </div>
 
@@ -437,7 +465,6 @@
                 allHorses.sort((a, b) => (b.likes || 0) - (a.likes || 0));
                 loadedHorses = allHorses; 
                 
-                // PERFORMANCE FIX: Only load the top 15 horses so the browser doesn't lag!
                 var topHorses = allHorses.slice(0, 15);
 
                 topHorses.forEach(function(horse, index) {
@@ -460,7 +487,6 @@
 
             var crownHTML = rank === 1 ? `<img src="/img/horserace/horse/horse_crown.png" class="layer" style="z-index: 5;">` : '';
 
-            // PERFORMANCE FIX: using transform to set position instead of left, and saving the position in data-x
             var horseHTML = `
                 <div class="horse-sprite" id="sprite-${horse.id}" style="transform: translateX(${startPosition}vw);" data-x="${startPosition}" onclick="openViewModal('${horse.id}', ${rank})">
                     <div class="horse-name">${horse.name}</div>
@@ -478,7 +504,6 @@
                 </div>
             `;
 
-            // PERFORMANCE FIX: cleaner injection method that doesn't break existing horses
             pastureArea.insertAdjacentHTML('beforeend', dynamicSVG + horseHTML);
             
             setTimeout(function() {
@@ -514,11 +539,11 @@
             
             var likedStorage = JSON.parse(localStorage.getItem('likedHorses') || '[]');
             if (likedStorage.includes(horseId)) {
-                likeBtn.innerText = "liked! (" + currentLikes + ")";
+                likeBtn.innerText = "👍 " + currentLikes;
                 likeBtn.style.opacity = "0.5";
                 likeBtn.style.pointerEvents = "none";
             } else {
-                likeBtn.innerText = "like (" + currentLikes + ")";
+                likeBtn.innerText = "👍 " + currentLikes;
                 likeBtn.style.opacity = "1";
                 likeBtn.style.pointerEvents = "auto";
             }
@@ -542,7 +567,7 @@
             horseBeingViewed.likes = newLikes; 
 
             var likeBtn = document.getElementById('view-like-btn');
-            likeBtn.innerText = "liked! (" + newLikes + ")";
+            likeBtn.innerText = "👍 " + newLikes;
             likeBtn.style.opacity = "0.5";
             likeBtn.style.pointerEvents = "none";
 
@@ -553,7 +578,6 @@
             await db.from('horses').update({ likes: newLikes }).eq('id', horseBeingViewed.id);
         }
 
-        // --- GPU ACCELERATED HORSE BRAIN ---
         function startHorseBrain(sprite) {
             function decideNextMove() {
                 if (!document.body.contains(sprite) || pastureArea.style.display !== "block") {
@@ -567,7 +591,6 @@
                     return;
                 }
 
-                // PERFORMANCE FIX: getting the location from the data-x attribute instead of left
                 var currentLeft = parseFloat(sprite.getAttribute('data-x')) || 50;
                 
                 var distance = (Math.random() * 15 + 10);
@@ -586,7 +609,6 @@
 
                 var walkTime = Math.abs(newLeft - currentLeft) * 0.3; 
                 
-                // PERFORMANCE FIX: animating transform is butter smooth
                 sprite.setAttribute('data-x', newLeft);
                 sprite.style.transition = "transform " + walkTime + "s linear";
                 sprite.style.transform = "translateX(" + newLeft + "vw)";
