@@ -3,25 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>horse</title>
+    <title>Horserace</title>
     <link rel="icon" type="image/png" href="/img/Icon.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
         body {
             margin: 0;
             padding: 0;
-            overflow: hidden; 
+            overflow: hidden;
             font-family: 'Nunito', sans-serif;
             color: #4a4a4a;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            text-transform: lowercase; 
+            text-transform: lowercase;
         }
 
         .bg-blur {
@@ -45,13 +41,13 @@
 
         .creator-container { width: 400px; overflow: hidden; }
         .name-modal { width: 300px; position: absolute; z-index: 100; display: none; overflow: hidden; }
-        
+
         .view-modal {
             width: 280px;
             position: absolute;
             z-index: 200;
             display: none;
-            overflow: visible; 
+            overflow: visible;
         }
 
         .list-modal {
@@ -83,7 +79,7 @@
         }
         .list-item:last-child { border-bottom: none; }
         .list-item:hover { background-color: #f0f4f8; }
-        
+
         .list-rank { width: 45px; color: #ff6b81; font-weight: 900; }
         .list-name { flex-grow: 1; text-align: left; padding-left: 10px; color: #4a4a4a; }
         .list-likes { color: #ffa502; font-weight: 900; }
@@ -93,16 +89,16 @@
             border-top-right-radius: 17px;
         }
 
-        .pasture-ui { 
-            position: absolute; 
-            top: 10px; 
-            left: 10px; 
-            display: none; 
+        .pasture-ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: none;
             z-index: 100;
         }
 
         .uma-header {
-            background-color: #8cc63f; 
+            background-color: #8cc63f;
             padding: 15px;
             text-align: center;
             border-bottom: 3px solid #77a833;
@@ -120,14 +116,12 @@
 
         .btn-close {
             position: absolute;
-            top: -15px;
-            left: -15px;
+            top: -15px; left: -15px;
             background: #ff6b81;
             color: #ffffff;
             border: 3px solid #ffffff;
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             font-size: 16px;
             font-weight: 900;
             cursor: pointer;
@@ -155,8 +149,7 @@
 
         .horse-preview {
             position: relative;
-            width: 100%;
-            height: 250px;
+            width: 100%; height: 250px;
             margin: 0 auto 20px auto;
             background: linear-gradient(to bottom, #87ceeb 0%, #87ceeb 60%, #90ee90 60%, #90ee90 100%);
             border-radius: 12px;
@@ -167,7 +160,7 @@
 
         .layer {
             position: absolute;
-            top: 0; left: 0; 
+            top: 0; left: 0;
             width: 100%; height: 100%;
             object-fit: contain;
             pointer-events: none;
@@ -199,7 +192,7 @@
             border-radius: 12px;
             margin-bottom: 10px;
         }
-        
+
         .control-group label { font-size: 15px; font-weight: 800; color: #555; }
 
         input[type="color"] {
@@ -224,7 +217,7 @@
         input[type="text"]:focus { border-color: #8cc63f; }
 
         .btn-save {
-            background-color: #8cc63f; 
+            background-color: #8cc63f;
             color: #ffffff;
             font-family: 'Nunito', sans-serif;
             border: 3px solid #ffffff;
@@ -242,28 +235,28 @@
             transform: translateY(4px);
             box-shadow: 0 0px 0px #5c8a22, 0 4px 5px rgba(0,0,0,0.1);
         }
-        
+
         .btn-secondary {
             background-color: #ff6b81;
             box-shadow: 0 4px 0px #d63031, 0 8px 10px rgba(0,0,0,0.1);
         }
         .btn-secondary:active { box-shadow: 0 0px 0px #d63031; }
 
-        .btn-like { 
-            background-color: #f8c291; 
-            box-shadow: 0 4px 0px #e19551, 0 8px 10px rgba(0,0,0,0.1); 
+        .btn-like {
+            background-color: #f8c291;
+            box-shadow: 0 4px 0px #e19551, 0 8px 10px rgba(0,0,0,0.1);
             width: auto;
             padding: 8px 30px;
             display: inline-block;
         }
         .btn-like:active { box-shadow: 0 0px 0px #e19551; }
 
-        .btn-small { 
-            width: auto; 
-            display: inline-block; 
-            margin-right: 5px; 
-            padding: 5px 12px; 
-            font-size: 13px; 
+        .btn-small {
+            width: auto;
+            display: inline-block;
+            margin-right: 5px;
+            padding: 5px 12px;
+            font-size: 13px;
             text-decoration: none;
         }
 
@@ -272,17 +265,15 @@
             bottom: 0; left: 0;
             width: 100%; height: 200px;
             display: none;
-            pointer-events: none; 
+            pointer-events: none;
         }
 
         .horse-sprite {
             position: absolute;
-            bottom: -32px; 
-            left: 0; 
-            width: 230px; 
-            height: 230px;
-            pointer-events: none; 
-            will-change: transform; 
+            bottom: -32px; left: 0;
+            width: 230px; height: 230px;
+            pointer-events: none;
+            will-change: transform;
         }
 
         .horse-images {
@@ -290,13 +281,12 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             pointer-events: none;
-            will-change: transform; 
+            will-change: transform;
         }
 
         .horse-name {
             position: absolute;
-            top: 15px; 
-            left: 50%;
+            top: 15px; left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.6);
             color: #fff;
@@ -306,11 +296,11 @@
             font-weight: 900;
             white-space: nowrap;
             z-index: 10;
-            pointer-events: auto; 
+            pointer-events: auto;
             cursor: pointer;
             transition: background 0.1s, transform 0.1s;
         }
-        
+
         .horse-name:hover {
             background: rgba(255, 107, 129, 0.9);
             transform: translateX(-50%) scale(1.1);
@@ -319,6 +309,11 @@
 </head>
 <body>
 
+    <!--
+        SVG color filters for the horse creator preview.
+        These are only manipulated via .setAttribute('flood-color', sanitizedHexColor)
+        using values that have been validated against /^#[0-9a-fA-F]{6}$/ before use.
+    -->
     <svg width="0" height="0" style="position:absolute;">
         <filter id="tint-fur"><feFlood flood-color="#ffffff" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
         <filter id="tint-hair"><feFlood flood-color="#ff9f43" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
@@ -382,8 +377,7 @@
         <div class="uma-header">
             <h2>all horses</h2>
         </div>
-        <div class="list-container" id="horse-list-container">
-            </div>
+        <div class="list-container" id="horse-list-container"></div>
     </div>
 
     <div class="uma-box view-modal" id="view-modal">
@@ -394,7 +388,6 @@
         <div class="uma-body" style="text-align: center;">
             <div class="horse-preview">
                 <div class="rank-badge" id="view-rank">#1</div>
-                
                 <img src="/img/horserace/horse/horse_basecolor.png" class="layer" style="filter: url(#tint-fur-view);">
                 <img src="/img/horserace/horse/horse_eyewhite.png" class="layer">
                 <img src="/img/horserace/horse/horse_baseoutline.png" class="layer">
@@ -403,10 +396,8 @@
                 <img src="/img/horserace/horse/horse_haircolor.png" class="layer" style="filter: url(#tint-hair-view);">
                 <img src="/img/horserace/horse/horse_hairoutline.png" class="layer">
                 <img src="/img/horserace/horse/horse_nosecolor.png" class="layer" style="filter: url(#tint-nose-view);">
-                
                 <img src="/img/horserace/horse/horse_crown.png" class="layer" id="view-crown" style="display: none; z-index: 5;">
             </div>
-
             <button class="btn-save btn-like" id="view-like-btn" onclick="toggleLike()">👍 0</button>
         </div>
     </div>
@@ -420,62 +411,120 @@
     <div id="pasture-area"></div>
 
     <script>
-        const supabaseUrl = 'https://qtthshswzfssdohtjrif.supabase.co'; 
-        const supabaseKey = 'sb_publishable_ix2Ku1eSUTgQhRn1vg_N6g_QO8tFRwp';
-        const db = supabase.createClient(supabaseUrl, supabaseKey);
 
-        var creatorView = document.getElementById('creator-view');
-        var nameModal = document.getElementById('name-modal');
-        var viewModal = document.getElementById('view-modal');
-        var listModal = document.getElementById('list-modal');
-        var pastureUI = document.getElementById('pasture-ui');
-        var pastureArea = document.getElementById('pasture-area');
-        
-        var inFur = document.getElementById('input-fur');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        var HEX_RE = /^#[0-9a-fA-F]{6}$/;
+
+
+        var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+
+        var NAME_RE = /^[a-zA-Z0-9 ]{1,15}$/;
+
+        function isValidHex(val) { return HEX_RE.test(val); }
+        function isValidUUID(val) { return UUID_RE.test(val); }
+        function isValidName(val) { return NAME_RE.test(val.trim()); }
+
+
+        function sanitizeText(str) {
+            if (!str) return "";
+            return String(str).replace(/[&<>"'`]/g, function(c) {
+                return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;','`':'&#x60;' })[c];
+            });
+        }
+
+
+        function safeHex(val, fallback) {
+            return isValidHex(val) ? val : fallback;
+        }
+
+
+
+        var creatorView  = document.getElementById('creator-view');
+        var nameModal    = document.getElementById('name-modal');
+        var viewModal    = document.getElementById('view-modal');
+        var listModal    = document.getElementById('list-modal');
+        var pastureUI    = document.getElementById('pasture-ui');
+        var pastureArea  = document.getElementById('pasture-area');
+
+        var inFur  = document.getElementById('input-fur');
         var inHair = document.getElementById('input-hair');
         var inNose = document.getElementById('input-nose');
         var inName = document.getElementById('input-name');
 
-        var currentHorseData = null;
-        var loadedHorses = []; 
-        var horseBeingViewed = null; 
+        var currentHorseData  = null;
+        var loadedHorses      = [];
+        var horseBeingViewed  = null;
 
-        // --- NEW: THE SANITIZER ---
-        // this turns dangerous code brackets into safe, readable text!
-        function escapeHTML(str) {
-            if (!str) return "";
-            return str.replace(/[&<>"']/g, function(match) {
-                switch (match) {
-                    case '&': return '&amp;';
-                    case '<': return '&lt;';
-                    case '>': return '&gt;';
-                    case '"': return '&quot;';
-                    case "'": return '&#039;';
-                    default: return match;
-                }
-            });
-        }
 
-        var savedHorse = localStorage.getItem('mySillyHorse');
-        if (savedHorse) {
-            currentHorseData = JSON.parse(savedHorse);
-            inFur.value = currentHorseData.fur;
-            inHair.value = currentHorseData.hair;
-            inNose.value = currentHorseData.nose;
-            inName.value = currentHorseData.name;
-            loadPasture();
-        }
 
-        inFur.addEventListener('input', applyCreatorColors);
+        (function restoreSavedHorse() {
+            try {
+                var saved = localStorage.getItem('mySillyHorse');
+                if (!saved) return;
+
+                var parsed = JSON.parse(saved);
+
+
+
+                if (!isValidUUID(parsed.id))       return;
+                if (!isValidName(parsed.name))     return;
+                if (!isValidHex(parsed.fur))       return;
+                if (!isValidHex(parsed.hair))      return;
+                if (!isValidHex(parsed.nose))      return;
+
+                currentHorseData = parsed;
+                inFur.value  = parsed.fur;
+                inHair.value = parsed.hair;
+                inNose.value = parsed.nose;
+                inName.value = parsed.name;
+                loadPasture();
+            } catch (e) {
+
+                localStorage.removeItem('mySillyHorse');
+            }
+        })();
+
+
+
+        inFur.addEventListener('input',  applyCreatorColors);
         inHair.addEventListener('input', applyCreatorColors);
         inNose.addEventListener('input', applyCreatorColors);
 
         function applyCreatorColors() {
-            document.querySelector('#tint-fur feFlood').setAttribute('flood-color', inFur.value);
-            document.querySelector('#tint-hair feFlood').setAttribute('flood-color', inHair.value);
-            document.querySelector('#tint-nose feFlood').setAttribute('flood-color', inNose.value);
+
+            var fur  = safeHex(inFur.value,  '#ffffff');
+            var hair = safeHex(inHair.value, '#ff9f43');
+            var nose = safeHex(inNose.value, '#ffb6c1');
+            document.querySelector('#tint-fur  feFlood').setAttribute('flood-color', fur);
+            document.querySelector('#tint-hair feFlood').setAttribute('flood-color', hair);
+            document.querySelector('#tint-nose feFlood').setAttribute('flood-color', nose);
         }
         applyCreatorColors();
+
+
 
         function openNameModal() {
             creatorView.style.pointerEvents = "none";
@@ -489,144 +538,249 @@
             nameModal.style.display = "none";
         }
 
+
+
         async function confirmAndSaveHorse() {
-            if (inName.value.trim() === "") {
+            var rawName = inName.value.trim();
+
+            if (!rawName) {
                 alert("please give your horse a name!");
                 return;
             }
 
-            let myId = localStorage.getItem('myHorseId');
-            if (!myId) {
-                myId = crypto.randomUUID ? crypto.randomUUID() : 'id-' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('myHorseId', myId);
-            }
 
-            currentHorseData = {
-                id: myId,
-                name: inName.value,
-                fur: inFur.value,
-                hair: inHair.value,
-                nose: inNose.value
-            };
-            
-            localStorage.setItem('mySillyHorse', JSON.stringify(currentHorseData));
-            
-            const { data, error } = await db.from('horses').upsert([currentHorseData], { onConflict: 'id' });
-            
-            if (error) {
-                console.error(error);
-                alert("error saving to the cloud! check console.");
+            if (!isValidName(rawName)) {
+                alert("name can only contain letters, numbers, and spaces (max 15 chars)!");
                 return;
             }
 
-            closeNameModal();
-            loadPasture();
+            var fur  = safeHex(inFur.value,  '#ffffff');
+            var hair = safeHex(inHair.value, '#ff9f43');
+            var nose = safeHex(inNose.value, '#ffb6c1');
+
+
+            var myId = localStorage.getItem('myHorseId');
+            if (!myId || !isValidUUID(myId)) {
+                myId = crypto.randomUUID
+                    ? crypto.randomUUID()
+                    : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                        var r = Math.random() * 16 | 0;
+                        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                    });
+                localStorage.setItem('myHorseId', myId);
+            }
+
+            var horsePayload = { id: myId, name: rawName, fur: fur, hair: hair, nose: nose };
+
+            try {
+
+                var res = await fetch('/api/horses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(horsePayload)
+                });
+
+                if (!res.ok) {
+                    var err = await res.json().catch(() => ({}));
+                    alert("error saving horse: " + (err.error || res.status));
+                    return;
+                }
+
+                currentHorseData = horsePayload;
+                localStorage.setItem('mySillyHorse', JSON.stringify(currentHorseData));
+
+                closeNameModal();
+                loadPasture();
+
+            } catch (e) {
+                console.error(e);
+                alert("network error — could not save horse.");
+            }
         }
+
+
 
         function editHorse() {
             pastureUI.style.display = "none";
             pastureArea.style.display = "none";
-            pastureArea.innerHTML = ""; 
+            pastureArea.innerHTML = "";
             creatorView.style.display = "block";
             closeListModal();
             closeViewModal();
         }
 
+
+
         async function loadPasture() {
             creatorView.style.display = "none";
             pastureUI.style.display = "block";
             pastureArea.style.display = "block";
-            pastureArea.innerHTML = ""; 
+            pastureArea.innerHTML = "";
 
-            const { data: allHorses, error } = await db.from('horses').select('*');
+            try {
+                var res = await fetch('/api/horses');
 
-            if (error) {
-                console.error(error);
-                return;
-            }
+                if (!res.ok) throw new Error('HTTP ' + res.status);
 
-            if (allHorses) {
-                allHorses.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-                loadedHorses = allHorses; 
-                
+                var allHorses = await res.json();
+
+
+
+
+                loadedHorses = allHorses
+                    .filter(function(h) {
+                        return isValidUUID(h.id)
+                            && typeof h.name === 'string'
+                            && isValidHex(h.fur)
+                            && isValidHex(h.hair)
+                            && isValidHex(h.nose);
+                    })
+                    .sort(function(a, b) { return (b.likes || 0) - (a.likes || 0); });
+
                 loadedHorses.forEach(function(horse, index) {
-                    renderHorseToPasture(horse, index + 1); 
+                    renderHorseToPasture(horse, index + 1);
                 });
 
                 renderListModal();
+
+            } catch (e) {
+                console.error("failed to load horses:", e);
             }
         }
 
+
+
         function renderHorseToPasture(horse, rank) {
-            var safeName = escapeHTML(horse.name); // securing the name!
 
-            var dynamicSVG = `
-                <svg width="0" height="0" style="position:absolute;">
-                    <filter id="tint-fur-${horse.id}"><feFlood flood-color="${horse.fur}" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
-                    <filter id="tint-hair-${horse.id}"><feFlood flood-color="${horse.hair}" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
-                    <filter id="tint-nose-${horse.id}"><feFlood flood-color="${horse.nose}" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
-                </svg>
-            `;
+            var fur  = safeHex(horse.fur,  '#ffffff');
+            var hair = safeHex(horse.hair, '#ff9f43');
+            var nose = safeHex(horse.nose, '#ffb6c1');
 
-            var startPosition = Math.floor(Math.random() * 80); 
-            var startFacing = Math.random() < 0.5 ? 1 : -1;
 
-            var crownHTML = rank === 1 ? `<img src="/img/horserace/horse/horse_crown.png" class="layer" style="z-index: 5;">` : '';
 
-            var horseHTML = `
-                <div class="horse-sprite" id="sprite-${horse.id}" style="transform: translateX(${startPosition}vw);" data-x="${startPosition}">
-                    <div class="horse-name" onclick="openViewModal('${horse.id}', ${rank})">${safeName}</div>
-                    <div class="horse-images" style="transform: scaleX(${startFacing});">
-                        <img src="/img/horserace/horse/horse_basecolor.png" class="layer" style="filter: url(#tint-fur-${horse.id});">
-                        <img src="/img/horserace/horse/horse_eyewhite.png" class="layer">
-                        <img src="/img/horserace/horse/horse_baseoutline.png" class="layer">
-                        <img src="/img/horserace/horse/horse_earcolor.png" class="layer" style="filter: url(#tint-fur-${horse.id});">
-                        <img src="/img/horserace/horse/horse_earoutline.png" class="layer">
-                        <img src="/img/horserace/horse/horse_haircolor.png" class="layer" style="filter: url(#tint-hair-${horse.id});">
-                        <img src="/img/horserace/horse/horse_hairoutline.png" class="layer">
-                        <img src="/img/horserace/horse/horse_nosecolor.png" class="layer" style="filter: url(#tint-nose-${horse.id});">
-                        ${crownHTML}
-                    </div>
-                </div>
-            `;
+            var svgNS   = 'http:
+            var svgWrap = document.createElementNS(svgNS, 'svg');
+            svgWrap.setAttribute('width', '0');
+            svgWrap.setAttribute('height', '0');
+            svgWrap.style.position = 'absolute';
 
-            pastureArea.insertAdjacentHTML('beforeend', dynamicSVG + horseHTML);
-            
+            [['fur', fur], ['hair', hair], ['nose', nose]].forEach(function(pair) {
+                var filter  = document.createElementNS(svgNS, 'filter');
+                filter.setAttribute('id', 'tint-' + pair[0] + '-' + horse.id);
+                var flood = document.createElementNS(svgNS, 'feFlood');
+                flood.setAttribute('flood-color', pair[1]);
+                flood.setAttribute('result', 'color');
+                var comp = document.createElementNS(svgNS, 'feComposite');
+                comp.setAttribute('in', 'color');
+                comp.setAttribute('in2', 'SourceAlpha');
+                comp.setAttribute('operator', 'in');
+                filter.appendChild(flood);
+                filter.appendChild(comp);
+                svgWrap.appendChild(filter);
+            });
+
+            pastureArea.appendChild(svgWrap);
+
+
+
+            var startPosition = Math.floor(Math.random() * 80);
+            var startFacing   = Math.random() < 0.5 ? 1 : -1;
+
+            var sprite = document.createElement('div');
+            sprite.className = 'horse-sprite';
+            sprite.id = 'sprite-' + horse.id;
+            sprite.style.transform = 'translateX(' + startPosition + 'vw)';
+            sprite.setAttribute('data-x', startPosition);
+
+
+            var nameLabel = document.createElement('div');
+            nameLabel.className = 'horse-name';
+            nameLabel.textContent = horse.name;
+            nameLabel.addEventListener('click', (function(id, r) {
+                return function() { openViewModal(id, r); };
+            })(horse.id, rank));
+            sprite.appendChild(nameLabel);
+
+
+            var imagesWrap = document.createElement('div');
+            imagesWrap.className = 'horse-images';
+            imagesWrap.style.transform = 'scaleX(' + startFacing + ')';
+
+            var layers = [
+                { src: '/img/horserace/horse/horse_basecolor.png',  filter: 'tint-fur-'  + horse.id },
+                { src: '/img/horserace/horse/horse_eyewhite.png',   filter: null },
+                { src: '/img/horserace/horse/horse_baseoutline.png',filter: null },
+                { src: '/img/horserace/horse/horse_earcolor.png',   filter: 'tint-fur-'  + horse.id },
+                { src: '/img/horserace/horse/horse_earoutline.png', filter: null },
+                { src: '/img/horserace/horse/horse_haircolor.png',  filter: 'tint-hair-' + horse.id },
+                { src: '/img/horserace/horse/horse_hairoutline.png',filter: null },
+                { src: '/img/horserace/horse/horse_nosecolor.png',  filter: 'tint-nose-' + horse.id },
+            ];
+
+            if (rank === 1) {
+                layers.push({ src: '/img/horserace/horse/horse_crown.png', filter: null, zIndex: 5 });
+            }
+
+            layers.forEach(function(l) {
+                var img = document.createElement('img');
+                img.src = l.src;
+                img.className = 'layer';
+                if (l.filter) img.style.filter = 'url(#' + l.filter + ')';
+                if (l.zIndex) img.style.zIndex = l.zIndex;
+                imagesWrap.appendChild(img);
+            });
+
+            sprite.appendChild(imagesWrap);
+            pastureArea.appendChild(sprite);
+
             setTimeout(function() {
-                var newSprite = document.getElementById('sprite-' + horse.id);
-                if (newSprite) {
-                    startHorseBrain(newSprite);
-                }
+                var el = document.getElementById('sprite-' + horse.id);
+                if (el) startHorseBrain(el);
             }, 100);
         }
 
+
+
         function renderListModal() {
-            loadedHorses.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-            
-            var listContainer = document.getElementById('horse-list-container');
-            var listHTML = '';
-            
-            loadedHorses.forEach(function(horse, index) {
-                var rank = index + 1;
-                var rankStr = rank === 1 ? '👑 1' : '#' + rank;
-                var safeName = escapeHTML(horse.name); // securing the list names!
-                
-                listHTML += `
-                    <div class="list-item" onclick="openViewModal('${horse.id}', ${rank})">
-                        <span class="list-rank">${rankStr}</span>
-                        <span class="list-name">${safeName}</span>
-                        <span class="list-likes">👍 ${horse.likes || 0}</span>
-                    </div>
-                `;
+            var sorted = loadedHorses.slice().sort(function(a, b) {
+                return (b.likes || 0) - (a.likes || 0);
             });
-            listContainer.innerHTML = listHTML;
+
+            var container = document.getElementById('horse-list-container');
+            container.innerHTML = '';
+
+            sorted.forEach(function(horse, index) {
+                var rank    = index + 1;
+                var item    = document.createElement('div');
+                item.className = 'list-item';
+                item.addEventListener('click', (function(id, r) {
+                    return function() { openViewModal(id, r); };
+                })(horse.id, rank));
+
+                var rankSpan  = document.createElement('span');
+                rankSpan.className = 'list-rank';
+                rankSpan.textContent = rank === 1 ? '👑 1' : '#' + rank;
+
+                var nameSpan  = document.createElement('span');
+                nameSpan.className = 'list-name';
+                nameSpan.textContent = horse.name;
+
+                var likesSpan = document.createElement('span');
+                likesSpan.className = 'list-likes';
+                likesSpan.textContent = '👍 ' + (horse.likes || 0);
+
+                item.appendChild(rankSpan);
+                item.appendChild(nameSpan);
+                item.appendChild(likesSpan);
+                container.appendChild(item);
+            });
         }
 
         function openListModal() {
-            closeViewModal(); 
+            closeViewModal();
             listModal.style.display = "block";
-            pastureArea.style.opacity = "0.3"; 
-            pastureArea.style.pointerEvents = "none"; 
+            pastureArea.style.opacity = "0.3";
+            pastureArea.style.pointerEvents = "none";
         }
 
         function closeListModal() {
@@ -637,45 +791,44 @@
             }
         }
 
-        function openViewModal(horseId, rank) {
-            closeListModal(); 
 
-            horseBeingViewed = loadedHorses.find(h => h.id === horseId);
+
+        function openViewModal(horseId, rank) {
+            closeListModal();
+            horseBeingViewed = loadedHorses.find(function(h) { return h.id === horseId; });
             if (!horseBeingViewed) return;
 
-            // innerText automatically escapes HTML, so this part was naturally secure!
-            document.getElementById('view-title').innerText = horseBeingViewed.name;
-            
-            document.querySelector('#tint-fur-view feFlood').setAttribute('flood-color', horseBeingViewed.fur);
-            document.querySelector('#tint-hair-view feFlood').setAttribute('flood-color', horseBeingViewed.hair);
-            document.querySelector('#tint-nose-view feFlood').setAttribute('flood-color', horseBeingViewed.nose);
+
+            document.getElementById('view-title').textContent = horseBeingViewed.name;
+
+            var fur  = safeHex(horseBeingViewed.fur,  '#ffffff');
+            var hair = safeHex(horseBeingViewed.hair, '#ff9f43');
+            var nose = safeHex(horseBeingViewed.nose, '#ffb6c1');
+
+            document.querySelector('#tint-fur-view  feFlood').setAttribute('flood-color', fur);
+            document.querySelector('#tint-hair-view feFlood').setAttribute('flood-color', hair);
+            document.querySelector('#tint-nose-view feFlood').setAttribute('flood-color', nose);
 
             var rankBadge = document.getElementById('view-rank');
-            rankBadge.innerText = "#" + rank;
+            rankBadge.textContent = '#' + rank;
             if (rank === 1) {
                 rankBadge.classList.add('gold');
-                document.getElementById('view-crown').style.display = "block";
+                document.getElementById('view-crown').style.display = 'block';
             } else {
                 rankBadge.classList.remove('gold');
-                document.getElementById('view-crown').style.display = "none";
+                document.getElementById('view-crown').style.display = 'none';
             }
 
-            var likeBtn = document.getElementById('view-like-btn');
+            var likeBtn      = document.getElementById('view-like-btn');
             var currentLikes = horseBeingViewed.likes || 0;
-            
             var likedStorage = JSON.parse(localStorage.getItem('likedHorses') || '[]');
-            
-            likeBtn.innerText = "👍 " + currentLikes;
-            
-            if (likedStorage.includes(horseId)) {
-                likeBtn.style.opacity = "0.6";
-            } else {
-                likeBtn.style.opacity = "1";
-            }
+
+            likeBtn.textContent = '👍 ' + currentLikes;
+            likeBtn.style.opacity = likedStorage.includes(horseId) ? '0.6' : '1';
 
             viewModal.style.display = "block";
-            pastureArea.style.opacity = "0.3"; 
-            pastureArea.style.pointerEvents = "none"; 
+            pastureArea.style.opacity = "0.3";
+            pastureArea.style.pointerEvents = "none";
         }
 
         function closeViewModal() {
@@ -685,33 +838,51 @@
             horseBeingViewed = null;
         }
 
+
+
         async function toggleLike() {
             if (!horseBeingViewed) return;
 
             var likedStorage = JSON.parse(localStorage.getItem('likedHorses') || '[]');
-            var isAlreadyLiked = likedStorage.includes(horseBeingViewed.id);
-            var currentLikes = horseBeingViewed.likes || 0;
-            var newLikes;
-            var likeBtn = document.getElementById('view-like-btn');
+            var isLiked      = likedStorage.includes(horseBeingViewed.id);
+            var likeBtn      = document.getElementById('view-like-btn');
 
-            if (isAlreadyLiked) {
-                newLikes = Math.max(0, currentLikes - 1);
-                likedStorage = likedStorage.filter(id => id !== horseBeingViewed.id);
-                likeBtn.style.opacity = "1";
+
+            var newLikes = isLiked
+                ? Math.max(0, (horseBeingViewed.likes || 0) - 1)
+                : (horseBeingViewed.likes || 0) + 1;
+
+            if (isLiked) {
+                likedStorage = likedStorage.filter(function(id) { return id !== horseBeingViewed.id; });
+                likeBtn.style.opacity = '1';
             } else {
-                newLikes = currentLikes + 1;
                 likedStorage.push(horseBeingViewed.id);
-                likeBtn.style.opacity = "0.6";
+                likeBtn.style.opacity = '0.6';
             }
 
-            horseBeingViewed.likes = newLikes; 
+            horseBeingViewed.likes = newLikes;
             localStorage.setItem('likedHorses', JSON.stringify(likedStorage));
-            likeBtn.innerText = "👍 " + newLikes;
+            likeBtn.textContent = '👍 ' + newLikes;
+            renderListModal();
 
-            renderListModal(); 
 
-            await db.from('horses').update({ likes: newLikes }).eq('id', horseBeingViewed.id);
+
+            try {
+                var res = await fetch('/api/horses/like', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ horseId: horseBeingViewed.id, liked: !isLiked })
+                });
+                if (!res.ok) {
+                    console.warn('like sync failed:', res.status);
+
+                }
+            } catch (e) {
+                console.warn('like network error:', e);
+            }
         }
+
+
 
         function startHorseBrain(sprite) {
             function decideNextMove() {
@@ -721,32 +892,26 @@
                 }
 
                 if (Math.random() < 0.6) {
-                    var napTime = Math.random() * 5000 + 3000; 
-                    setTimeout(decideNextMove, napTime);
+                    setTimeout(decideNextMove, Math.random() * 5000 + 3000);
                     return;
                 }
 
                 var currentLeft = parseFloat(sprite.getAttribute('data-x')) || 50;
-                
-                var distance = (Math.random() * 15 + 10);
-                var direction = Math.random() < 0.5 ? 1 : -1;
-                var newLeft = currentLeft + (distance * direction);
-                
-                if (newLeft < 5) newLeft = 5 + Math.random() * 5;
+                var distance    = Math.random() * 15 + 10;
+                var direction   = Math.random() < 0.5 ? 1 : -1;
+                var newLeft     = currentLeft + (distance * direction);
+
+                if (newLeft < 5)  newLeft = 5  + Math.random() * 5;
                 if (newLeft > 80) newLeft = 80 - Math.random() * 5;
 
                 var horseImages = sprite.querySelector('.horse-images');
-                if (newLeft > currentLeft) {
-                    horseImages.style.transform = "scaleX(1)";
-                } else {
-                    horseImages.style.transform = "scaleX(-1)";
-                }
+                horseImages.style.transform = newLeft > currentLeft ? 'scaleX(1)' : 'scaleX(-1)';
 
-                var walkTime = Math.abs(newLeft - currentLeft) * 0.3; 
-                
+                var walkTime = Math.abs(newLeft - currentLeft) * 0.3;
+
                 sprite.setAttribute('data-x', newLeft);
-                sprite.style.transition = "transform " + walkTime + "s linear";
-                sprite.style.transform = "translateX(" + newLeft + "vw)";
+                sprite.style.transition = 'transform ' + walkTime + 's linear';
+                sprite.style.transform  = 'translateX(' + newLeft + 'vw)';
 
                 setTimeout(decideNextMove, (walkTime * 1000) + 2000);
             }
@@ -755,6 +920,5 @@
         }
 
     </script>
-
 </body>
 </html>
