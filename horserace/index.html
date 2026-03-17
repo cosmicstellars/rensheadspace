@@ -54,7 +54,6 @@
             overflow: visible; 
         }
 
-        /* new leaderboard modal styles */
         .list-modal {
             width: 340px;
             position: absolute;
@@ -282,7 +281,6 @@
             left: 0; 
             width: 230px; 
             height: 230px;
-            /* HUGE FIX: disable the big invisible square hitbox! */
             pointer-events: none; 
             will-change: transform; 
         }
@@ -308,7 +306,6 @@
             font-weight: 900;
             white-space: nowrap;
             z-index: 10;
-            /* enable clicking ONLY on the name tag itself! */
             pointer-events: auto; 
             cursor: pointer;
             transition: background 0.1s, transform 0.1s;
@@ -383,7 +380,7 @@
     <div class="uma-box list-modal" id="list-modal">
         <button class="btn-close" onclick="closeListModal()">x</button>
         <div class="uma-header">
-            <h2>horse list</h2>
+            <h2>all horses</h2>
         </div>
         <div class="list-container" id="horse-list-container">
             </div>
@@ -417,7 +414,7 @@
     <div class="pasture-ui" id="pasture-ui">
         <a href="/" class="btn-save btn-secondary btn-small">←</a>
         <button class="btn-save btn-small" onclick="editHorse()">edit</button>
-        <button class="btn-save btn-small btn-like" style="margin-left: 5px;" onclick="openListModal()">horse list</button>
+        <button class="btn-save btn-small btn-like" style="margin-left: 5px;" onclick="openListModal()">all horses 📋</button>
     </div>
 
     <div id="pasture-area"></div>
@@ -442,6 +439,22 @@
         var currentHorseData = null;
         var loadedHorses = []; 
         var horseBeingViewed = null; 
+
+        // --- NEW: THE SANITIZER ---
+        // this turns dangerous code brackets into safe, readable text!
+        function escapeHTML(str) {
+            if (!str) return "";
+            return str.replace(/[&<>"']/g, function(match) {
+                switch (match) {
+                    case '&': return '&amp;';
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '"': return '&quot;';
+                    case "'": return '&#039;';
+                    default: return match;
+                }
+            });
+        }
 
         var savedHorse = localStorage.getItem('mySillyHorse');
         if (savedHorse) {
@@ -533,21 +546,20 @@
             }
 
             if (allHorses) {
-                // sort horses by global cloud likes
                 allHorses.sort((a, b) => (b.likes || 0) - (a.likes || 0));
                 loadedHorses = allHorses; 
                 
-                // load every single horse!
                 loadedHorses.forEach(function(horse, index) {
                     renderHorseToPasture(horse, index + 1); 
                 });
 
-                // build the leaderboard list
                 renderListModal();
             }
         }
 
         function renderHorseToPasture(horse, rank) {
+            var safeName = escapeHTML(horse.name); // securing the name!
+
             var dynamicSVG = `
                 <svg width="0" height="0" style="position:absolute;">
                     <filter id="tint-fur-${horse.id}"><feFlood flood-color="${horse.fur}" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
@@ -561,10 +573,9 @@
 
             var crownHTML = rank === 1 ? `<img src="/img/horserace/horse/horse_crown.png" class="layer" style="z-index: 5;">` : '';
 
-            // sprite div no longer has onclick. onclick is ONLY on the name tag!
             var horseHTML = `
                 <div class="horse-sprite" id="sprite-${horse.id}" style="transform: translateX(${startPosition}vw);" data-x="${startPosition}">
-                    <div class="horse-name" onclick="openViewModal('${horse.id}', ${rank})">${horse.name}</div>
+                    <div class="horse-name" onclick="openViewModal('${horse.id}', ${rank})">${safeName}</div>
                     <div class="horse-images" style="transform: scaleX(${startFacing});">
                         <img src="/img/horserace/horse/horse_basecolor.png" class="layer" style="filter: url(#tint-fur-${horse.id});">
                         <img src="/img/horserace/horse/horse_eyewhite.png" class="layer">
@@ -589,9 +600,7 @@
             }, 100);
         }
 
-        // --- LEADERBOARD LIST LOGIC ---
         function renderListModal() {
-            // ensure they are perfectly sorted by likes before building the list
             loadedHorses.sort((a, b) => (b.likes || 0) - (a.likes || 0));
             
             var listContainer = document.getElementById('horse-list-container');
@@ -600,11 +609,12 @@
             loadedHorses.forEach(function(horse, index) {
                 var rank = index + 1;
                 var rankStr = rank === 1 ? '👑 1' : '#' + rank;
+                var safeName = escapeHTML(horse.name); // securing the list names!
                 
                 listHTML += `
                     <div class="list-item" onclick="openViewModal('${horse.id}', ${rank})">
                         <span class="list-rank">${rankStr}</span>
-                        <span class="list-name">${horse.name}</span>
+                        <span class="list-name">${safeName}</span>
                         <span class="list-likes">👍 ${horse.likes || 0}</span>
                     </div>
                 `;
@@ -613,7 +623,7 @@
         }
 
         function openListModal() {
-            closeViewModal(); // close profile if it's open
+            closeViewModal(); 
             listModal.style.display = "block";
             pastureArea.style.opacity = "0.3"; 
             pastureArea.style.pointerEvents = "none"; 
@@ -621,20 +631,19 @@
 
         function closeListModal() {
             listModal.style.display = "none";
-            // only restore pasture if the view modal isn't also open
             if (viewModal.style.display !== "block") {
                 pastureArea.style.opacity = "1";
                 pastureArea.style.pointerEvents = "auto";
             }
         }
 
-        // --- VIEW PROFILE LOGIC ---
         function openViewModal(horseId, rank) {
-            closeListModal(); // hide list if it was open
+            closeListModal(); 
 
             horseBeingViewed = loadedHorses.find(h => h.id === horseId);
             if (!horseBeingViewed) return;
 
+            // innerText automatically escapes HTML, so this part was naturally secure!
             document.getElementById('view-title').innerText = horseBeingViewed.name;
             
             document.querySelector('#tint-fur-view feFlood').setAttribute('flood-color', horseBeingViewed.fur);
@@ -699,7 +708,6 @@
             localStorage.setItem('likedHorses', JSON.stringify(likedStorage));
             likeBtn.innerText = "👍 " + newLikes;
 
-            // update the list in the background so the numbers match!
             renderListModal(); 
 
             await db.from('horses').update({ likes: newLikes }).eq('id', horseBeingViewed.id);
