@@ -6,6 +6,7 @@
     <title>Horserace</title>
     <link rel="icon" type="image/png" href="/img/Icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+
     <style>
         body {
             margin: 0;
@@ -309,11 +310,6 @@
 </head>
 <body>
 
-    <!--
-        SVG color filters for the horse creator preview.
-        These are only manipulated via .setAttribute('flood-color', sanitizedHexColor)
-        using values that have been validated against /^#[0-9a-fA-F]{6}$/ before use.
-    -->
     <svg width="0" height="0" style="position:absolute;">
         <filter id="tint-fur"><feFlood flood-color="#ffffff" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
         <filter id="tint-hair"><feFlood flood-color="#ff9f43" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
@@ -411,29 +407,6 @@
     <div id="pasture-area"></div>
 
     <script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         var HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
@@ -658,7 +631,7 @@
 
 
 
-            var svgNS   = 'http:
+            var svgNS   = 'http://www.w3.org/2000/svg';
             var svgWrap = document.createElementNS(svgNS, 'svg');
             svgWrap.setAttribute('width', '0');
             svgWrap.setAttribute('height', '0');
@@ -881,7 +854,6 @@
                 console.warn('like network error:', e);
             }
         }
-
 
 
         function startHorseBrain(sprite) {
