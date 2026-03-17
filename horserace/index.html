@@ -43,21 +43,9 @@
             position: relative;
         }
 
-        /* creator still hides overflow to keep the box clean */
-        .creator-container { 
-            width: 400px; 
-            overflow: hidden; 
-        }
+        .creator-container { width: 400px; overflow: hidden; }
+        .name-modal { width: 300px; position: absolute; z-index: 100; display: none; overflow: hidden; }
         
-        .name-modal { 
-            width: 300px; 
-            position: absolute; 
-            z-index: 100; 
-            display: none; 
-            overflow: hidden; 
-        }
-        
-        /* view modal must have visible overflow so the x button can float outside! */
         .view-modal {
             width: 280px;
             position: absolute;
@@ -66,8 +54,42 @@
             overflow: visible; 
         }
 
-        /* because overflow is visible, we manually round the header corners */
-        .view-modal .uma-header {
+        /* new leaderboard modal styles */
+        .list-modal {
+            width: 340px;
+            position: absolute;
+            z-index: 150;
+            display: none;
+            overflow: visible;
+        }
+
+        .list-container {
+            max-height: 350px;
+            overflow-y: auto;
+            background: #ffffff;
+            border-bottom-left-radius: 17px;
+            border-bottom-right-radius: 17px;
+            padding: 10px 0;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 2px solid #e1e5e8;
+            cursor: pointer;
+            font-weight: 800;
+            transition: background-color 0.1s;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background-color: #f0f4f8; }
+        
+        .list-rank { width: 45px; color: #ff6b81; font-weight: 900; }
+        .list-name { flex-grow: 1; text-align: left; padding-left: 10px; color: #4a4a4a; }
+        .list-likes { color: #ffa502; font-weight: 900; }
+
+        .view-modal .uma-header, .list-modal .uma-header {
             border-top-left-radius: 17px;
             border-top-right-radius: 17px;
         }
@@ -97,7 +119,6 @@
             letter-spacing: 1px;
         }
 
-        /* floating close button */
         .btn-close {
             position: absolute;
             top: -15px;
@@ -229,7 +250,6 @@
         }
         .btn-secondary:active { box-shadow: 0 0px 0px #d63031; }
 
-        /* like button is now smaller and centered! */
         .btn-like { 
             background-color: #f8c291; 
             box-shadow: 0 4px 0px #e19551, 0 8px 10px rgba(0,0,0,0.1); 
@@ -262,8 +282,8 @@
             left: 0; 
             width: 230px; 
             height: 230px;
-            pointer-events: auto; 
-            cursor: pointer;
+            /* HUGE FIX: disable the big invisible square hitbox! */
+            pointer-events: none; 
             will-change: transform; 
         }
 
@@ -288,6 +308,15 @@
             font-weight: 900;
             white-space: nowrap;
             z-index: 10;
+            /* enable clicking ONLY on the name tag itself! */
+            pointer-events: auto; 
+            cursor: pointer;
+            transition: background 0.1s, transform 0.1s;
+        }
+        
+        .horse-name:hover {
+            background: rgba(255, 107, 129, 0.9);
+            transform: translateX(-50%) scale(1.1);
         }
     </style>
 </head>
@@ -351,6 +380,15 @@
         </div>
     </div>
 
+    <div class="uma-box list-modal" id="list-modal">
+        <button class="btn-close" onclick="closeListModal()">x</button>
+        <div class="uma-header">
+            <h2>horse list</h2>
+        </div>
+        <div class="list-container" id="horse-list-container">
+            </div>
+    </div>
+
     <div class="uma-box view-modal" id="view-modal">
         <button class="btn-close" onclick="closeViewModal()">x</button>
         <div class="uma-header">
@@ -379,6 +417,7 @@
     <div class="pasture-ui" id="pasture-ui">
         <a href="/" class="btn-save btn-secondary btn-small">←</a>
         <button class="btn-save btn-small" onclick="editHorse()">edit</button>
+        <button class="btn-save btn-small btn-like" style="margin-left: 5px;" onclick="openListModal()">all horses 📋</button>
     </div>
 
     <div id="pasture-area"></div>
@@ -391,6 +430,7 @@
         var creatorView = document.getElementById('creator-view');
         var nameModal = document.getElementById('name-modal');
         var viewModal = document.getElementById('view-modal');
+        var listModal = document.getElementById('list-modal');
         var pastureUI = document.getElementById('pasture-ui');
         var pastureArea = document.getElementById('pasture-area');
         
@@ -475,6 +515,8 @@
             pastureArea.style.display = "none";
             pastureArea.innerHTML = ""; 
             creatorView.style.display = "block";
+            closeListModal();
+            closeViewModal();
         }
 
         async function loadPasture() {
@@ -491,14 +533,17 @@
             }
 
             if (allHorses) {
+                // sort horses by global cloud likes
                 allHorses.sort((a, b) => (b.likes || 0) - (a.likes || 0));
                 loadedHorses = allHorses; 
                 
-                var topHorses = allHorses.slice(0, 15);
-
-                topHorses.forEach(function(horse, index) {
+                // load every single horse!
+                loadedHorses.forEach(function(horse, index) {
                     renderHorseToPasture(horse, index + 1); 
                 });
+
+                // build the leaderboard list
+                renderListModal();
             }
         }
 
@@ -516,9 +561,10 @@
 
             var crownHTML = rank === 1 ? `<img src="/img/horserace/horse/horse_crown.png" class="layer" style="z-index: 5;">` : '';
 
+            // sprite div no longer has onclick. onclick is ONLY on the name tag!
             var horseHTML = `
-                <div class="horse-sprite" id="sprite-${horse.id}" style="transform: translateX(${startPosition}vw);" data-x="${startPosition}" onclick="openViewModal('${horse.id}', ${rank})">
-                    <div class="horse-name">${horse.name}</div>
+                <div class="horse-sprite" id="sprite-${horse.id}" style="transform: translateX(${startPosition}vw);" data-x="${startPosition}">
+                    <div class="horse-name" onclick="openViewModal('${horse.id}', ${rank})">${horse.name}</div>
                     <div class="horse-images" style="transform: scaleX(${startFacing});">
                         <img src="/img/horserace/horse/horse_basecolor.png" class="layer" style="filter: url(#tint-fur-${horse.id});">
                         <img src="/img/horserace/horse/horse_eyewhite.png" class="layer">
@@ -543,7 +589,49 @@
             }, 100);
         }
 
+        // --- LEADERBOARD LIST LOGIC ---
+        function renderListModal() {
+            // ensure they are perfectly sorted by likes before building the list
+            loadedHorses.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+            
+            var listContainer = document.getElementById('horse-list-container');
+            var listHTML = '';
+            
+            loadedHorses.forEach(function(horse, index) {
+                var rank = index + 1;
+                var rankStr = rank === 1 ? '👑 1' : '#' + rank;
+                
+                listHTML += `
+                    <div class="list-item" onclick="openViewModal('${horse.id}', ${rank})">
+                        <span class="list-rank">${rankStr}</span>
+                        <span class="list-name">${horse.name}</span>
+                        <span class="list-likes">👍 ${horse.likes || 0}</span>
+                    </div>
+                `;
+            });
+            listContainer.innerHTML = listHTML;
+        }
+
+        function openListModal() {
+            closeViewModal(); // close profile if it's open
+            listModal.style.display = "block";
+            pastureArea.style.opacity = "0.3"; 
+            pastureArea.style.pointerEvents = "none"; 
+        }
+
+        function closeListModal() {
+            listModal.style.display = "none";
+            // only restore pasture if the view modal isn't also open
+            if (viewModal.style.display !== "block") {
+                pastureArea.style.opacity = "1";
+                pastureArea.style.pointerEvents = "auto";
+            }
+        }
+
+        // --- VIEW PROFILE LOGIC ---
         function openViewModal(horseId, rank) {
+            closeListModal(); // hide list if it was open
+
             horseBeingViewed = loadedHorses.find(h => h.id === horseId);
             if (!horseBeingViewed) return;
 
@@ -570,7 +658,6 @@
             
             likeBtn.innerText = "👍 " + currentLikes;
             
-            // if already liked, dim the button slightly but keep it clickable!
             if (likedStorage.includes(horseId)) {
                 likeBtn.style.opacity = "0.6";
             } else {
@@ -589,7 +676,6 @@
             horseBeingViewed = null;
         }
 
-        // --- NEW TOGGLE LIKE LOGIC ---
         async function toggleLike() {
             if (!horseBeingViewed) return;
 
@@ -600,12 +686,10 @@
             var likeBtn = document.getElementById('view-like-btn');
 
             if (isAlreadyLiked) {
-                // UNLIKE IT
                 newLikes = Math.max(0, currentLikes - 1);
                 likedStorage = likedStorage.filter(id => id !== horseBeingViewed.id);
                 likeBtn.style.opacity = "1";
             } else {
-                // LIKE IT
                 newLikes = currentLikes + 1;
                 likedStorage.push(horseBeingViewed.id);
                 likeBtn.style.opacity = "0.6";
@@ -615,7 +699,9 @@
             localStorage.setItem('likedHorses', JSON.stringify(likedStorage));
             likeBtn.innerText = "👍 " + newLikes;
 
-            // push the update to supabase
+            // update the list in the background so the numbers match!
+            renderListModal(); 
+
             await db.from('horses').update({ likes: newLikes }).eq('id', horseBeingViewed.id);
         }
 
