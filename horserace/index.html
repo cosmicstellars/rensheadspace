@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horserace</title>
+    <title>horse</title>
     <link rel="icon" type="image/png" href="/img/Icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         body {
@@ -309,7 +311,6 @@
     </style>
 </head>
 <body>
-
     <svg width="0" height="0" style="position:absolute;">
         <filter id="tint-fur"><feFlood flood-color="#ffffff" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
         <filter id="tint-hair"><feFlood flood-color="#ff9f43" result="color"/><feComposite in="color" in2="SourceAlpha" operator="in"/></filter>
@@ -408,6 +409,20 @@
 
     <script>
 
+
+
+
+
+
+
+        var supabaseUrl = 'https://qtthshswzfssdohtjrif.supabase.co';
+        var supabaseKey = 'sb_publishable_ix2Ku1eSUTgQhRn1vg_N6g_QO8tFRwp';
+        var db = supabase.createClient(supabaseUrl, supabaseKey);
+
+
+
+
+
         var HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
 
@@ -491,7 +506,7 @@
             var fur  = safeHex(inFur.value,  '#ffffff');
             var hair = safeHex(inHair.value, '#ff9f43');
             var nose = safeHex(inNose.value, '#ffb6c1');
-            document.querySelector('#tint-fur  feFlood').setAttribute('flood-color', fur);
+            document.querySelector('#tint-fur feFlood').setAttribute('flood-color', fur);
             document.querySelector('#tint-hair feFlood').setAttribute('flood-color', hair);
             document.querySelector('#tint-nose feFlood').setAttribute('flood-color', nose);
         }
@@ -521,7 +536,6 @@
                 return;
             }
 
-
             if (!isValidName(rawName)) {
                 alert("name can only contain letters, numbers, and spaces (max 15 chars)!");
                 return;
@@ -530,7 +544,6 @@
             var fur  = safeHex(inFur.value,  '#ffffff');
             var hair = safeHex(inHair.value, '#ff9f43');
             var nose = safeHex(inNose.value, '#ffb6c1');
-
 
             var myId = localStorage.getItem('myHorseId');
             if (!myId || !isValidUUID(myId)) {
@@ -545,30 +558,18 @@
 
             var horsePayload = { id: myId, name: rawName, fur: fur, hair: hair, nose: nose };
 
-            try {
+            var result = await db.from('horses').upsert([horsePayload], { onConflict: 'id' });
 
-                var res = await fetch('/api/horses', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(horsePayload)
-                });
-
-                if (!res.ok) {
-                    var err = await res.json().catch(() => ({}));
-                    alert("error saving horse: " + (err.error || res.status));
-                    return;
-                }
-
-                currentHorseData = horsePayload;
-                localStorage.setItem('mySillyHorse', JSON.stringify(currentHorseData));
-
-                closeNameModal();
-                loadPasture();
-
-            } catch (e) {
-                console.error(e);
-                alert("network error — could not save horse.");
+            if (result.error) {
+                console.error(result.error);
+                alert("error saving horse!");
+                return;
             }
+
+            currentHorseData = horsePayload;
+            localStorage.setItem('mySillyHorse', JSON.stringify(currentHorseData));
+            closeNameModal();
+            loadPasture();
         }
 
 
@@ -590,35 +591,30 @@
             pastureArea.style.display = "block";
             pastureArea.innerHTML = "";
 
-            try {
-                var res = await fetch('/api/horses');
+            var result = await db.from('horses').select('*');
 
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-
-                var allHorses = await res.json();
-
-
-
-
-                loadedHorses = allHorses
-                    .filter(function(h) {
-                        return isValidUUID(h.id)
-                            && typeof h.name === 'string'
-                            && isValidHex(h.fur)
-                            && isValidHex(h.hair)
-                            && isValidHex(h.nose);
-                    })
-                    .sort(function(a, b) { return (b.likes || 0) - (a.likes || 0); });
-
-                loadedHorses.forEach(function(horse, index) {
-                    renderHorseToPasture(horse, index + 1);
-                });
-
-                renderListModal();
-
-            } catch (e) {
-                console.error("failed to load horses:", e);
+            if (result.error) {
+                console.error(result.error);
+                return;
             }
+
+
+
+            loadedHorses = (result.data || [])
+                .filter(function(h) {
+                    return isValidUUID(h.id)
+                        && typeof h.name === 'string'
+                        && isValidHex(h.fur)
+                        && isValidHex(h.hair)
+                        && isValidHex(h.nose);
+                })
+                .sort(function(a, b) { return (b.likes || 0) - (a.likes || 0); });
+
+            loadedHorses.forEach(function(horse, index) {
+                renderHorseToPasture(horse, index + 1);
+            });
+
+            renderListModal();
         }
 
 
@@ -778,7 +774,7 @@
             var hair = safeHex(horseBeingViewed.hair, '#ff9f43');
             var nose = safeHex(horseBeingViewed.nose, '#ffb6c1');
 
-            document.querySelector('#tint-fur-view  feFlood').setAttribute('flood-color', fur);
+            document.querySelector('#tint-fur-view feFlood').setAttribute('flood-color', fur);
             document.querySelector('#tint-hair-view feFlood').setAttribute('flood-color', hair);
             document.querySelector('#tint-nose-view feFlood').setAttribute('flood-color', nose);
 
@@ -839,21 +835,9 @@
             renderListModal();
 
 
-
-            try {
-                var res = await fetch('/api/horses/like', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ horseId: horseBeingViewed.id, liked: !isLiked })
-                });
-                if (!res.ok) {
-                    console.warn('like sync failed:', res.status);
-
-                }
-            } catch (e) {
-                console.warn('like network error:', e);
-            }
+            await db.from('horses').update({ likes: newLikes }).eq('id', horseBeingViewed.id);
         }
+
 
 
         function startHorseBrain(sprite) {
