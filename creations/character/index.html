@@ -26,20 +26,31 @@
             width: 80px;
         }
 
-        /* --- HORIZONTAL SCROLLING GALLERY --- */
+        /* --- STYLIZED NAME --- */
+        .character-name-header {
+            text-align: center; 
+            color: #8e8cf0; 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 20px;
+            letter-spacing: 2px; 
+            margin: 5px 0 15px 0;
+            text-shadow: 0 0 5px #5c5a8a;
+        }
+
+        /* --- FULL-WIDTH HORIZONTAL SCROLLING GALLERY --- */
         .horizontal-gallery {
             display: flex;
             flex-wrap: nowrap;
             overflow-x: auto;
             gap: 15px;
-            padding-bottom: 15px; /* room for the custom scrollbar */
+            padding-bottom: 15px; 
             
-            /* firefox scrollbar styling */
+            /* firefox scrollbar */
             scrollbar-width: thin;
             scrollbar-color: #8e8cf0 rgba(51, 50, 82, 0.6);
         }
 
-        /* chrome/edge/safari scrollbar styling */
+        /* chrome/edge/safari scrollbar */
         .horizontal-gallery::-webkit-scrollbar {
             height: 8px;
         }
@@ -56,10 +67,9 @@
             background-color: #c4c3f5;
         }
 
-        /* lock the width of the items so they don't squish */
         .horizontal-gallery .gallery-item {
             flex: 0 0 auto;
-            width: 150px; 
+            width: 160px; /* slightly wider now that we have full screen space! */
         }
     </style>
 </head>
@@ -88,60 +98,62 @@
             [<a href="#" style="margin: 0 4px;">downloads</a>]
         </div>
 
-        <div class="columns" id="profile-content" style="display: none;">
+        <div id="profile-content" style="display: none;">
             
-            <div class="left-col">
-                <div class="box">
-                    <div class="box-title" id="char-name">name</div>
-                    
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <img id="char-img" src="" style="width: 100%; max-width: 200px; border: 1px solid #48476e; background-color: #1e1d30; object-fit: cover;">
-                    </div>
-                    
-                    <div class="char-stat"><b>age:</b> <span id="char-age">?</span></div>
-                    <div class="char-stat"><b>gender:</b> <span id="char-gender">?</span></div>
-                    <div class="char-stat"><b>pronouns:</b> <span id="char-pronouns">?</span></div>
-                    <div class="char-stat"><b>sexuality:</b> <span id="char-sexuality">?</span></div>
-                    <div class="char-stat" id="species-container" style="display: none;"><b>species:</b> <span id="char-species">?</span></div>
-                </div>
-            </div>
-
-            <div class="right-col">
-                <div class="box">
-                    <div class="box-title">character lore</div>
-                    <div id="blog-feed">
+            <div class="columns">
+                <div class="left-col">
+                    <div class="box">
+                        <div class="box-title">profile</div>
                         
-                        <div class="blog-entry">
-                            <div class="blog-header">
-                                <span class="blog-title">description</span>
-                            </div>
-                            <div class="blog-content" id="char-desc"></div>
+                        <div class="character-name-header" id="char-name">name</div>
+                        
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <img id="char-img" src="" style="width: 100%; max-width: 200px; border: 1px solid #48476e; background-color: #1e1d30; object-fit: cover;">
                         </div>
-
-                        <div class="blog-entry">
-                            <div class="blog-header">
-                                <span class="blog-title">backstory</span>
-                            </div>
-                            <div class="blog-content" id="char-backstory"></div>
-                        </div>
-
-                        <div class="blog-entry" style="margin-bottom: 10px;">
-                            <div class="blog-header">
-                                <span class="blog-title">relationships</span>
-                            </div>
-                            <div class="blog-content" id="char-relationships"></div>
-                        </div>
-
+                        
+                        <div class="char-stat"><b>age:</b> <span id="char-age">?</span></div>
+                        <div class="char-stat"><b>gender:</b> <span id="char-gender">?</span></div>
+                        <div class="char-stat"><b>pronouns:</b> <span id="char-pronouns">?</span></div>
+                        <div class="char-stat"><b>sexuality:</b> <span id="char-sexuality">?</span></div>
+                        <div class="char-stat" id="species-container" style="display: none;"><b>species:</b> <span id="char-species">?</span></div>
                     </div>
                 </div>
 
-                <div class="box" id="char-gallery-box" style="display: none;">
-                    <div class="box-title">gallery</div>
-                    <div class="horizontal-gallery" id="char-gallery-feed">
-                        </div>
-                </div>
+                <div class="right-col">
+                    <div class="box">
+                        <div class="box-title">character lore</div>
+                        <div id="blog-feed">
+                            
+                            <div class="blog-entry">
+                                <div class="blog-header">
+                                    <span class="blog-title">description</span>
+                                </div>
+                                <div class="blog-content" id="char-desc"></div>
+                            </div>
 
+                            <div class="blog-entry">
+                                <div class="blog-header">
+                                    <span class="blog-title">backstory</span>
+                                </div>
+                                <div class="blog-content" id="char-backstory"></div>
+                            </div>
+
+                            <div class="blog-entry" style="margin-bottom: 10px;">
+                                <div class="blog-header">
+                                    <span class="blog-title">relationships</span>
+                                </div>
+                                <div class="blog-content" id="char-relationships"></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div> <div class="box" id="char-gallery-box" style="display: none; width: 100%; box-sizing: border-box;">
+                <div class="box-title">gallery</div>
+                <div class="horizontal-gallery" id="char-gallery-feed">
+                    </div>
             </div>
+
         </div>
 
         <div id="error-msg" style="text-align: center; margin-top: 50px; color: #8e8cf0; font-weight: bold; display: none;">
@@ -169,7 +181,6 @@
     <script src="/ocs.js?v=3"></script>
 
     <script>
-        // --- Lightbox Functions ---
         var lightbox = document.getElementById('lightbox');
         var lbImg = document.getElementById('lightbox-img');
         var lbTitle = document.getElementById('lightbox-title');
@@ -202,7 +213,6 @@
             });
         }
 
-        // --- Character Loading Logic ---
         var urlParams = new URLSearchParams(window.location.search);
         var charQuery = urlParams.get('char');
 
@@ -219,13 +229,12 @@
         }
 
         if (foundChar) {
-            document.getElementById('profile-content').style.display = 'flex';
+            document.getElementById('profile-content').style.display = 'block'; // Changed to block to stack the gallery!
             
             document.title = "ren's headspace - " + foundChar.title;
             document.getElementById('char-name').innerText = foundChar.title;
             document.getElementById('char-img').src = foundChar.image;
             
-            // Left Column
             document.getElementById('char-age').innerText = foundChar.age || "unknown";
             document.getElementById('char-gender').innerText = foundChar.gender || "unknown";
             document.getElementById('char-pronouns').innerText = foundChar.pronouns || "any";
@@ -236,7 +245,6 @@
                 document.getElementById('species-container').style.display = 'block';
             }
 
-            // Right Column
             document.getElementById('char-desc').innerHTML = foundChar.description || "no description provided.";
             document.getElementById('char-backstory').innerHTML = foundChar.backstory || "a mystery waiting to be uncovered...";
             document.getElementById('char-relationships').innerHTML = foundChar.relationships || "loner.";
