@@ -94,15 +94,14 @@
             width: 100%;
         }
 
-        /* --- NEW: WIP MINI POLAROIDS (No Grayscale!) --- */
         .mini-polaroid.wip {
-            cursor: default; /* standard arrow cursor instead of clicky hand */
+            cursor: default; 
         }
 
         .mini-polaroid.wip:hover {
-            transform: none; /* removes the hover jump */
-            border-color: #48476e; /* keeps standard border */
-            background-color: rgba(51, 50, 82, 0.6); /* keeps standard background */
+            transform: none; 
+            border-color: #48476e; 
+            background-color: rgba(51, 50, 82, 0.6); 
         }
 
         .mini-polaroid .placeholder-img {
@@ -141,19 +140,31 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            background-color: transparent; /* overrides style.css background */
+            border: none; /* overrides style.css border */
+            padding: 0;
         }
         
+        /* FIXED: Force aspect-ratio to auto so style.css stops squaring it! */
         .horizontal-gallery .gallery-thumb {
             height: 160px; 
             width: auto; 
             max-width: 400px; 
+            aspect-ratio: auto; /* <--- THIS KILLS THE SQUARE CROP! */
+            object-fit: contain; 
             border: 1px dotted #5c5a8a;
             cursor: pointer;
             padding: 2px; 
+            margin-bottom: 0; /* overrides style.css margin */
         }
 
         .horizontal-gallery .gallery-item:hover .gallery-thumb {
             border: 1px solid #8e8cf0;
+        }
+        
+        .horizontal-gallery .gallery-item:hover {
+            background-color: transparent; /* prevents weird hover boxes */
+            border-color: transparent;
         }
 
         .gallery-caption {
@@ -162,7 +173,7 @@
             text-align: center;
             line-height: 1.3;
             max-width: 100%;
-            margin-top: 5px; 
+            margin-top: 8px; 
         }
     </style>
 </head>
@@ -380,7 +391,7 @@
                                 }
                             } else {
                                 relHTML += `
-                                    <div class="mini-polaroid" style="cursor: default;">
+                                    <div class="mini-polaroid wip" style="cursor: default;">
                                         <div class="placeholder-img">?</div>
                                         <span>${escapeHTML(relId)}</span>
                                     </div>
