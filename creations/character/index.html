@@ -60,7 +60,7 @@
             background-color: rgba(51, 50, 82, 0.6);
             padding: 5px 5px 8px 5px; 
             border: 1px solid #48476e;
-            width: 70px; 
+            width: 70px; /* tiny! */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -104,6 +104,7 @@
             background-color: rgba(51, 50, 82, 0.6); 
         }
 
+        /* missing character placeholder */
         .mini-polaroid .placeholder-img {
             width: 100%;
             height: 70px;
@@ -117,6 +118,7 @@
             font-size: 20px;
             font-weight: bold;
         }
+
 
         /* --- FULL-WIDTH HORIZONTAL SCROLLING GALLERY --- */
         .horizontal-gallery {
@@ -140,30 +142,30 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: transparent; /* overrides style.css background */
-            border: none; /* overrides style.css border */
+            background-color: transparent; 
+            border: none; 
             padding: 0;
         }
         
-        /* FIXED: Force aspect-ratio to auto so style.css stops squaring it! */
+        /* FIXED: These !important tags stop style.css from making them squares! */
         .horizontal-gallery .gallery-thumb {
-            height: 160px; 
-            width: auto; 
+            height: 160px !important; 
+            width: auto !important; 
             max-width: 400px; 
-            aspect-ratio: auto; /* <--- THIS KILLS THE SQUARE CROP! */
-            object-fit: contain; 
-            border: 1px dotted #5c5a8a;
+            aspect-ratio: auto !important; /* <--- THIS FIXES THE CROPPING! */
+            object-fit: contain !important; 
+            border: 1px dotted #5c5a8a !important;
             cursor: pointer;
             padding: 2px; 
-            margin-bottom: 0; /* overrides style.css margin */
+            margin-bottom: 0 !important; 
         }
 
         .horizontal-gallery .gallery-item:hover .gallery-thumb {
-            border: 1px solid #8e8cf0;
+            border: 1px solid #8e8cf0 !important;
         }
-        
+
         .horizontal-gallery .gallery-item:hover {
-            background-color: transparent; /* prevents weird hover boxes */
+            background-color: transparent; 
             border-color: transparent;
         }
 
@@ -175,13 +177,37 @@
             max-width: 100%;
             margin-top: 8px; 
         }
+
+        /* --- NEW: LIGHTBOX ARROWS --- */
+        .lb-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(30, 29, 48, 0.9);
+            color: #8e8cf0;
+            border: 1px solid #48476e;
+            font-size: 24px;
+            padding: 15px 20px;
+            cursor: pointer;
+            z-index: 100002;
+            transition: all 0.2s;
+        }
+        .lb-nav:hover {
+            background: #8e8cf0;
+            color: #0b0b14;
+        }
+        #lightbox-prev { left: 5%; }
+        #lightbox-next { right: 5%; }
     </style>
 </head>
 <body>
 
     <div id="lightbox" onclick="closeLightbox(event)">
         <button id="lightbox-close" onclick="closeLightbox(event)" title="Close">✖</button>
-        <div id="lightbox-content-box">
+        <button id="lightbox-prev" class="lb-nav" onclick="changeLightbox(-1, event)">&#10094;</button>
+        <button id="lightbox-next" class="lb-nav" onclick="changeLightbox(1, event)">&#10095;</button>
+        
+        <div id="lightbox-content-box" onclick="event.stopPropagation()">
             <img id="lightbox-img" src="" alt="Creation Image">
             <div id="lightbox-title"></div>
             <div id="lightbox-desc"></div>
@@ -284,24 +310,46 @@
         }
     </script>
 
-    <script src="/ocs.js?v=6"></script>
+    <script src="/ocs.js?v=7"></script>
 
     <script>
-        var lightbox = document.getElementById('lightbox');
-        var lbImg = document.getElementById('lightbox-img');
-        var lbTitle = document.getElementById('lightbox-title');
-        var lbDesc = document.getElementById('lightbox-desc');
+        // --- NEW: GALLERY LIGHTBOX LOGIC ---
+        var currentGalleryItems = [];
+        var currentGalleryIndex = 0;
 
-        window.openLightbox = function(title, imgUrl, desc) {
-            lbImg.src = imgUrl;
-            lbTitle.innerText = title;
-            lbDesc.innerText = desc;
-            lightbox.style.display = 'flex';
+        window.openLightbox = function(index) {
+            currentGalleryIndex = index;
+            updateLightbox();
+            document.getElementById('lightbox').style.display = 'flex';
+        };
+
+        window.updateLightbox = function() {
+            if (!currentGalleryItems || currentGalleryItems.length === 0) return;
+            var item = currentGalleryItems[currentGalleryIndex];
+            
+            document.getElementById('lightbox-img').src = item.image;
+            document.getElementById('lightbox-title').innerText = item.title || "";
+            document.getElementById('lightbox-desc').innerText = item.description || "";
+            
+            // Hides the text containers entirely if there's no description/title
+            document.getElementById('lightbox-title').style.display = item.title ? "block" : "none";
+            document.getElementById('lightbox-desc').style.display = item.description ? "block" : "none";
+
+            // Hides arrows if we are at the very beginning or end of the gallery
+            document.getElementById('lightbox-prev').style.display = currentGalleryIndex > 0 ? "block" : "none";
+            document.getElementById('lightbox-next').style.display = currentGalleryIndex < currentGalleryItems.length - 1 ? "block" : "none";
+        };
+
+        window.changeLightbox = function(dir, event) {
+            if (event) event.stopPropagation(); // Stops the background click from closing it
+            currentGalleryIndex += dir;
+            updateLightbox();
         };
 
         window.closeLightbox = function(event) {
-            if (event.target === lightbox || event.target.id === 'lightbox-close') {
-                lightbox.style.display = 'none';
+            // Only closes if you click the X or the black background!
+            if (event.target === document.getElementById('lightbox') || event.target.id === 'lightbox-close') {
+                document.getElementById('lightbox').style.display = 'none';
             }
         };
 
@@ -329,6 +377,7 @@
         var foundChar = null;
         if (charQuery) {
             foundChar = allOCs.find(function(c) {
+                // Forces everything to lowercase to catch mismatched typing!
                 var idToCheck = c.id ? c.id.toLowerCase() : c.title.toLowerCase().replace(/\s+/g, '-');
                 return idToCheck === charQuery.toLowerCase();
             });
@@ -366,6 +415,7 @@
                     if (rel.chars && Array.isArray(rel.chars)) {
                         rel.chars.forEach(function(relId) {
                             var relatedChar = allOCs.find(function(c) {
+                                // Forces the relationship ID to lowercase to match Mizuki correctly!
                                 var idToCheck = c.id ? c.id.toLowerCase() : c.title.toLowerCase().replace(/\s+/g, '-');
                                 return idToCheck === relId.toLowerCase();
                             });
@@ -407,18 +457,27 @@
                 relContainer.innerHTML = "loner.";
             }
 
+            // --- NEW: GALLERY RENDERER WITH LIGHTBOX ARRAYS ---
             if (foundChar.gallery && foundChar.gallery.length > 0) {
                 document.getElementById('char-gallery-box').style.display = "block";
 
-                var galHTML = '';
-                foundChar.gallery.forEach(function(item) {
-                    var safeImg = escapeHTML(item.image);
-                    var safeDesc = item.description ? escapeHTML(item.description) : "";
-                    var captionHTML = safeDesc ? `<div class="gallery-caption">${safeDesc}</div>` : "";
+                // Stores the gallery data so the arrows know what to show next
+                currentGalleryItems = foundChar.gallery.map(function(item) {
+                    return {
+                        title: item.title || "",
+                        image: escapeHTML(item.image),
+                        description: item.description ? escapeHTML(item.description) : ""
+                    };
+                });
 
+                var galHTML = '';
+                currentGalleryItems.forEach(function(item, index) {
+                    var captionHTML = item.description ? `<div class="gallery-caption">${item.description}</div>` : "";
+
+                    // We now pass the INDEX number to the lightbox instead of text!
                     galHTML += `
-                        <div class="gallery-item" onclick="window.openLightbox('', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}')">
-                            <img src="${safeImg}" class="gallery-thumb" alt="gallery image">
+                        <div class="gallery-item" onclick="window.openLightbox(${index})">
+                            <img src="${item.image}" class="gallery-thumb" alt="gallery image">
                             ${captionHTML}
                         </div>
                     `;

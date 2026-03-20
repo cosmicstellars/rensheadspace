@@ -1,8 +1,9 @@
 var ocsHumanData = [
     {
         "id": "seiichi",  
-        "title": "Seiichi",
+        "title": "Seiichi Soushi",
         "image": "/img/ocs/seiichi/icon.png",
+		"category": "the Soushi family",
 		"wip": false,
         
         "age": "21",
@@ -36,8 +37,9 @@ var ocsHumanData = [
     }, // <-- notice the comma here! this separates the characters.
      {
         "id": "mizuki",
-        "title": "Mizuki",
+        "title": "Mizuki Soushi",
         "image": "/img/ocs/mizuki/icon.png",
+		"category": "the Soushi family",
 		"wip": true,
         
         "age": "",
