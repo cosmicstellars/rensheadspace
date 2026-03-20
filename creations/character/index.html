@@ -198,6 +198,38 @@
         }
         #lightbox-prev { left: 5%; }
         #lightbox-next { right: 5%; }
+
+        /* --- LIGHTBOX OVERRIDES --- */
+        #lightbox-content-box {
+            width: fit-content !important; /* forces the box to hug the image exactly */
+            max-width: 95vw;
+            background: transparent !important; /* removes the bulky background box entirely */
+            border: none !important;
+            padding: 0 !important;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #lightbox-img {
+            max-width: 90vw;
+            max-height: 85vh; /* keeps tall images from going off-screen */
+            width: auto !important; 
+            height: auto !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* optional: gives the image a nice floating shadow since the box is gone */
+            border: 1px solid #48476e; /* optional: adds a subtle border to the image itself */
+        }
+
+        /* gives the text a tiny background so it's still readable over the dark overlay */
+        #lightbox-title, #lightbox-desc {
+            background: rgba(30, 29, 48, 0.9); 
+            border: 1px dotted #48476e;
+            padding: 5px 10px;
+            margin-top: 8px;
+            text-align: center;
+            max-width: 100%;
+        }
     </style>
 </head>
 <body>
