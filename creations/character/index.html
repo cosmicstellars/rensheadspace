@@ -60,7 +60,7 @@
             background-color: rgba(51, 50, 82, 0.6);
             padding: 5px 5px 8px 5px; 
             border: 1px solid #48476e;
-            width: 70px; /* tiny! */
+            width: 70px; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -94,7 +94,17 @@
             width: 100%;
         }
 
-        /* missing character placeholder */
+        /* --- NEW: WIP MINI POLAROIDS (No Grayscale!) --- */
+        .mini-polaroid.wip {
+            cursor: default; /* standard arrow cursor instead of clicky hand */
+        }
+
+        .mini-polaroid.wip:hover {
+            transform: none; /* removes the hover jump */
+            border-color: #48476e; /* keeps standard border */
+            background-color: rgba(51, 50, 82, 0.6); /* keeps standard background */
+        }
+
         .mini-polaroid .placeholder-img {
             width: 100%;
             height: 70px;
@@ -108,7 +118,6 @@
             font-size: 20px;
             font-weight: bold;
         }
-
 
         /* --- FULL-WIDTH HORIZONTAL SCROLLING GALLERY --- */
         .horizontal-gallery {
@@ -134,17 +143,13 @@
             align-items: center;
         }
         
-        /* FIXED: Set height instead of width so images don't get cropped! */
         .horizontal-gallery .gallery-thumb {
             height: 160px; 
-            width: auto; /* scales naturally! */
-            max-width: 400px; /* prevents super-long panoramic images from taking over */
-            object-fit: contain; /* ensures NO cropping */
+            width: auto; 
+            max-width: 400px; 
             border: 1px dotted #5c5a8a;
-            background-color: #1e1d30;
             cursor: pointer;
-            margin-bottom: 5px;
-            padding: 2px; /* adds a tiny gap between the border and image */
+            padding: 2px; 
         }
 
         .horizontal-gallery .gallery-item:hover .gallery-thumb {
@@ -156,7 +161,8 @@
             color: #8382ad;
             text-align: center;
             line-height: 1.3;
-            max-width: 160px;
+            max-width: 100%;
+            margin-top: 5px; 
         }
     </style>
 </head>
@@ -312,7 +318,6 @@
         var foundChar = null;
         if (charQuery) {
             foundChar = allOCs.find(function(c) {
-                // Safely convert ID to lowercase to prevent bugs!
                 var idToCheck = c.id ? c.id.toLowerCase() : c.title.toLowerCase().replace(/\s+/g, '-');
                 return idToCheck === charQuery.toLowerCase();
             });
@@ -338,7 +343,6 @@
             document.getElementById('char-desc').innerHTML = foundChar.description || "no description provided.";
             document.getElementById('char-backstory').innerHTML = foundChar.backstory || "a mystery waiting to be uncovered...";
             
-            // --- AUTOMATIC MINI-POLAROID RELATIONSHIPS (WITH LOWERCASE FIX!) ---
             var relContainer = document.getElementById('char-relationships');
             if (foundChar.relationships && Array.isArray(foundChar.relationships)) {
                 var relHTML = '';
@@ -351,7 +355,6 @@
                     if (rel.chars && Array.isArray(rel.chars)) {
                         rel.chars.forEach(function(relId) {
                             var relatedChar = allOCs.find(function(c) {
-                                // Safely convert ID to lowercase here too!
                                 var idToCheck = c.id ? c.id.toLowerCase() : c.title.toLowerCase().replace(/\s+/g, '-');
                                 return idToCheck === relId.toLowerCase();
                             });
@@ -359,12 +362,22 @@
                             if (relatedChar) {
                                 var safeTitle = escapeHTML(relatedChar.title);
                                 var safeImg = escapeHTML(relatedChar.image);
-                                relHTML += `
-                                    <a href="/creations/character?char=${encodeURIComponent(relId.toLowerCase())}" class="mini-polaroid">
-                                        <img src="${safeImg}" alt="${safeTitle}">
-                                        <span>${safeTitle}</span>
-                                    </a>
-                                `;
+                                
+                                if (relatedChar.wip) {
+                                    relHTML += `
+                                        <div class="mini-polaroid wip" title="wip!">
+                                            <img src="${safeImg}" alt="${safeTitle}">
+                                            <span>${safeTitle}</span>
+                                        </div>
+                                    `;
+                                } else {
+                                    relHTML += `
+                                        <a href="/creations/character?char=${encodeURIComponent(relId.toLowerCase())}" class="mini-polaroid">
+                                            <img src="${safeImg}" alt="${safeTitle}">
+                                            <span>${safeTitle}</span>
+                                        </a>
+                                    `;
+                                }
                             } else {
                                 relHTML += `
                                     <div class="mini-polaroid" style="cursor: default;">
@@ -383,7 +396,6 @@
                 relContainer.innerHTML = "loner.";
             }
 
-            // --- UN-CROPPED GALLERY RENDERING ---
             if (foundChar.gallery && foundChar.gallery.length > 0) {
                 document.getElementById('char-gallery-box').style.display = "block";
 
