@@ -42,7 +42,7 @@ var ocsHumanData = [
         
         "age": "",
         "gender": "",
-        "pronouns": ",
+        "pronouns": "",
         "sexuality": "",
         
         "description": "",
