@@ -64,36 +64,40 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- FIXED: TUMBLR-STYLE UNIVERSE TOGGLES --- */
+        /* --- STYLIZED RETRO UNIVERSE TAGS --- */
         .universe-toggle {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 30px;
-            font-family: 'Nunito', sans-serif;
-            font-size: 13px;
-            color: #8382ad;
         }
 
         .uni-btn {
-            background: none;
-            border: none;
+            background-color: #ffffff;
+            border: 1px solid #d1d8dc;
             color: #8382ad;
             font-family: 'Nunito', sans-serif;
             font-weight: 800;
-            font-size: 14px;
+            font-size: 12px;
+            letter-spacing: 1px;
             cursor: pointer;
-            padding: 2px 6px;
-            transition: color 0.1s;
+            padding: 6px 14px;
+            transition: all 0.1s;
         }
 
         .uni-btn:hover {
+            border-color: #b3b1f5;
+            background-color: #f4f3ff;
             color: #8e8cf0;
         }
 
         .uni-btn.active {
-            color: #b3b1f5;
-            border-bottom: 2px dashed #b3b1f5; /* cute dashed line instead of dotted! */
+            background-color: #b3b1f5;
+            color: #ffffff;
+            border-color: #b3b1f5;
+            /* classic retro hard-edge drop shadow! */
+            box-shadow: 2px 2px 0px #8e8cf0; 
+            transform: translate(-2px, -2px);
         }
 
         .universe-section {
@@ -236,8 +240,8 @@
         <div id="section-ocs" class="page-section">
             
             <div class="universe-toggle">
-                * <button class="uni-btn active" id="btn-uni-human" onclick="switchUniverse('human')">human universe</button> |
-                <button class="uni-btn" id="btn-uni-fantasy" onclick="switchUniverse('fantasy')">fantasy universe</button> *
+                <button class="uni-btn active" id="btn-uni-human" onclick="switchUniverse('human')">human universe</button>
+                <button class="uni-btn" id="btn-uni-fantasy" onclick="switchUniverse('fantasy')">fantasy universe</button>
             </div>
 
             <div class="oc-viewer" id="main-oc-viewer">
@@ -320,7 +324,7 @@
             filterGallery();
         }
 
-        // --- NEW: UNIVERSE SWITCHER LOGIC ---
+        // --- UNIVERSE SWITCHER LOGIC ---
         function switchUniverse(uniId) {
             document.getElementById('btn-uni-human').classList.remove('active');
             document.getElementById('btn-uni-fantasy').classList.remove('active');
