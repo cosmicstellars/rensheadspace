@@ -108,78 +108,13 @@
             display: block;
         }
 
-
-        /* --- OC VIEWER STYLES --- */
-        .oc-viewer {
-            display: none;
-            background: #ffffff;
-            border: 3px solid #8e8cf0;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px auto 30px auto;
-            max-width: 600px;
-            box-shadow: 0 8px 20px rgba(142, 140, 240, 0.2);
-            text-align: left;
-            animation: popIn 0.2s ease-out;
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0.95); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .oc-viewer-inner {
-            display: flex;
-            gap: 20px;
-        }
-
-        .oc-viewer-portrait {
-            width: 180px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid #d1d8dc;
-            background-color: #f7f9fa;
-        }
-
-        .oc-viewer-info {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .oc-viewer-name {
-            margin: 0 0 5px 0;
-            font-size: 24px;
-            color: #4a4a4a;
-            font-weight: 900;
-        }
-
-        .oc-viewer-species {
-            margin: 0 0 10px 0;
-            font-size: 13px;
-            color: #ff6b81;
-            font-weight: 800;
-            text-transform: lowercase;
-            letter-spacing: 1px;
-        }
-
-        .oc-viewer-desc {
-            margin: 0;
-            font-size: 15px;
-            color: #555;
-            line-height: 1.6;
-            font-weight: 700;
-        }
-
-        /* --- NEW: POLAROID ROSTER STYLES --- */
+        /* --- NEW: POLAROID CARD STYLES --- */
         .oc-category-title {
             text-align: center;
-            font-size: 14px;
-            font-weight: 800;
+            font-size: 15px;
+            font-weight: 900;
             color: #ff6b81;
-            margin: 30px 0 15px 0;
+            margin: 40px 0 20px 0;
             border-bottom: 1px dashed #ffb8b8;
             display: block;
             padding-bottom: 5px;
@@ -188,61 +123,64 @@
         .oc-roster {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 25px;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .polaroid {
             background: #ffffff;
-            padding: 8px 8px 12px 8px;
+            padding: 12px 12px 20px 12px;
             border: 1px solid #e1e5e8;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-            width: 100px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+            width: 220px;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: all 0.15s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
+            text-align: center;
         }
 
         .polaroid:hover {
-            transform: translateY(-4px) rotate(2deg);
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
+            transform: translateY(-5px) rotate(1deg);
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
             border-color: #b3b1f5;
         }
 
-        .polaroid.active {
-            border-color: #8e8cf0;
-            box-shadow: 3px 3px 0px #b3b1f5;
-            transform: translate(-2px, -2px);
-        }
-
         .polaroid-img {
-            width: 100px;
-            height: 100px;
+            width: 100%;
+            height: 200px;
             object-fit: cover;
             border: 1px solid #f0f4f8;
-            margin-bottom: 8px;
+            margin-bottom: 15px;
             background-color: #f7f9fa;
         }
 
         .polaroid-name {
-            font-size: 13px;
+            font-size: 18px;
             font-weight: 900;
             color: #4a4a4a;
-            text-align: center;
-            margin: 0;
+            margin: 0 0 5px 0;
             line-height: 1.2;
         }
 
         .polaroid-species {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
-            color: #8382ad;
-            text-align: center;
-            margin: 2px 0 0 0;
-            opacity: 0.7;
+            color: #ff6b81;
+            margin: 0 0 10px 0;
+            opacity: 0.8;
+            text-transform: lowercase;
+            letter-spacing: 1px;
+        }
+
+        .polaroid-desc {
+            font-size: 13px;
+            color: #666;
+            margin: 0;
+            line-height: 1.5;
+            font-weight: 700;
         }
     </style>
 </head>
@@ -292,17 +230,6 @@
             <div class="universe-toggle">
                 <button class="uni-btn active" id="btn-uni-human" onclick="switchUniverse('human')">human universe</button>
                 <button class="uni-btn" id="btn-uni-fantasy" onclick="switchUniverse('fantasy')">fantasy universe</button>
-            </div>
-
-            <div class="oc-viewer" id="main-oc-viewer">
-                <div class="oc-viewer-inner">
-                    <img src="" id="viewer-img" class="oc-viewer-portrait">
-                    <div class="oc-viewer-info">
-                        <h2 class="oc-viewer-name" id="viewer-name">Name</h2>
-                        <div class="oc-viewer-species" id="viewer-species"></div>
-                        <p class="oc-viewer-desc" id="viewer-desc">Lore goes here...</p>
-                    </div>
-                </div>
             </div>
 
             <div id="uni-human" class="universe-section active">
@@ -382,10 +309,6 @@
             document.getElementById('uni-human').classList.remove('active');
             document.getElementById('uni-fantasy').classList.remove('active');
             document.getElementById('uni-' + uniId).classList.add('active');
-
-            document.getElementById('main-oc-viewer').style.display = 'none';
-            var allIcons = document.querySelectorAll('.polaroid');
-            allIcons.forEach(icon => icon.classList.remove('active'));
         }
 
         function escapeHTML(str) {
@@ -446,33 +369,7 @@
             container.innerHTML = gridHTML;
         };
 
-        // --- NEW CATEGORIZED POLAROID LOGIC ---
-        var viewerBox = document.getElementById('main-oc-viewer');
-        var viewerImg = document.getElementById('viewer-img');
-        var viewerName = document.getElementById('viewer-name');
-        var viewerSpecies = document.getElementById('viewer-species');
-        var viewerDesc = document.getElementById('viewer-desc');
-
-        window.selectOC = function(title, imgUrl, desc, species, iconElement) {
-            viewerImg.src = imgUrl;
-            viewerName.innerText = title;
-            viewerDesc.innerText = desc;
-            
-            // if they have a species, show it in the viewer!
-            if (species && species !== "undefined" && species.trim() !== "") {
-                viewerSpecies.innerText = "✦ " + species + " ✦";
-                viewerSpecies.style.display = "block";
-            } else {
-                viewerSpecies.style.display = "none";
-            }
-            
-            viewerBox.style.display = 'block';
-
-            var allIcons = document.querySelectorAll('.polaroid');
-            allIcons.forEach(icon => icon.classList.remove('active'));
-            iconElement.classList.add('active');
-        };
-
+        // --- UPDATED: ALL INFO DRAWN DIRECTLY ON THE CARDS ---
         window.renderRoster = function(dataArray, containerId) {
             var container = document.getElementById(containerId);
             if (!container) return;
@@ -482,7 +379,6 @@
                 return;
             }
 
-            // Step 1: Group characters by category
             var groupedData = {};
             dataArray.forEach(function(item) {
                 var cat = item.category || "uncategorized";
@@ -492,13 +388,11 @@
                 groupedData[cat].push(item);
             });
 
-            // Step 2: Build the HTML
             var html = '';
             
             for (var category in groupedData) {
-                // Print a category header if it's not uncategorized
                 if (category !== "uncategorized") {
-                    html += `<div class="oc-category-title">${escapeHTML(category)}</div>`;
+                    html += `<div class="oc-category-title">✦ ${escapeHTML(category)} ✦</div>`;
                 }
 
                 html += `<div class="oc-roster">`;
@@ -509,13 +403,15 @@
                     var safeDesc = escapeHTML(item.description);
                     var safeSpecies = item.species ? escapeHTML(item.species) : "";
                     
-                    var speciesHtml = safeSpecies ? `<p class="polaroid-species">${safeSpecies}</p>` : "";
+                    var speciesHtml = safeSpecies ? `<p class="polaroid-species">✦ ${safeSpecies} ✦</p>` : "";
 
+                    // Clicking the card now opens the standard lightbox!
                     html += `
-                        <div class="polaroid" onclick="window.selectOC('${safeTitle.replace(/'/g, "\\'")}', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}', '${safeSpecies.replace(/'/g, "\\'")}', this)">
+                        <div class="polaroid" onclick="window.openLightbox('${safeTitle.replace(/'/g, "\\'")}', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}')">
                             <img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">
-                            <p class="polaroid-name">${safeTitle}</p>
+                            <h3 class="polaroid-name">${safeTitle}</h3>
                             ${speciesHtml}
+                            <p class="polaroid-desc">${safeDesc}</p>
                         </div>
                     `;
                 });
@@ -549,8 +445,6 @@
                 });
                 window.renderRoster(filteredFantasy, 'roster-fantasy-container');
             }
-
-            viewerBox.style.display = 'none';
         };
 
         // --- INITIAL LOAD ---
