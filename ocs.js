@@ -37,7 +37,7 @@ var ocsHumanData = [
      {
         "id": "Mizuki",
         "title": "Mizuki",
-        "image": "/img/ocs/mizuki/icon.png"
+        "image": "/img/ocs/mizuki/icon.png",
 		"wip": true,
         
         "age": "",
