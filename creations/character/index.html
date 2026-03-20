@@ -129,30 +129,34 @@
 
         .horizontal-gallery .gallery-item {
             flex: 0 0 auto;
-            width: 160px;
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
         
+        /* FIXED: Set height instead of width so images don't get cropped! */
         .horizontal-gallery .gallery-thumb {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
+            height: 160px; 
+            width: auto; /* scales naturally! */
+            max-width: 400px; /* prevents super-long panoramic images from taking over */
+            object-fit: contain; /* ensures NO cropping */
             border: 1px dotted #5c5a8a;
+            background-color: #1e1d30;
             cursor: pointer;
             margin-bottom: 5px;
+            padding: 2px; /* adds a tiny gap between the border and image */
         }
 
         .horizontal-gallery .gallery-item:hover .gallery-thumb {
             border: 1px solid #8e8cf0;
         }
 
-        /* optional gallery description text */
         .gallery-caption {
             font-size: 10px;
             color: #8382ad;
             text-align: center;
             line-height: 1.3;
+            max-width: 160px;
         }
     </style>
 </head>
@@ -176,7 +180,7 @@
 
         <div class="nav-bar">
             [<a href="/" style="margin: 0 4px;">home</a>] 
-            [<a href="/creations" style="margin: 0 4px; color: #8e8cf0; font-weight: bold;">art & ocs</a>] 
+            [<a href="/creations" style="margin: 0 4px; color: #8e8cf0; font-weight: bold;">creations & ocs</a>] 
             [<a href="/projects" style="margin: 0 4px;">games & dev</a>] 
             [<a href="#" style="margin: 0 4px;">downloads</a>]
         </div>
@@ -263,7 +267,7 @@
         }
     </script>
 
-    <script src="/ocs.js?v=5"></script>
+    <script src="/ocs.js?v=6"></script>
 
     <script>
         var lightbox = document.getElementById('lightbox');
@@ -308,8 +312,9 @@
         var foundChar = null;
         if (charQuery) {
             foundChar = allOCs.find(function(c) {
-                var idToCheck = c.id || c.title.toLowerCase().replace(/\s+/g, '-');
-                return idToCheck === charQuery;
+                // Safely convert ID to lowercase to prevent bugs!
+                var idToCheck = c.id ? c.id.toLowerCase() : c.title.toLowerCase().replace(/\s+/g, '-');
+                return idToCheck === charQuery.toLowerCase();
             });
         }
 
@@ -333,7 +338,7 @@
             document.getElementById('char-desc').innerHTML = foundChar.description || "no description provided.";
             document.getElementById('char-backstory').innerHTML = foundChar.backstory || "a mystery waiting to be uncovered...";
             
-            // --- AUTOMATIC MINI-POLAROID RELATIONSHIPS ---
+            // --- AUTOMATIC MINI-POLAROID RELATIONSHIPS (WITH LOWERCASE FIX!) ---
             var relContainer = document.getElementById('char-relationships');
             if (foundChar.relationships && Array.isArray(foundChar.relationships)) {
                 var relHTML = '';
@@ -345,24 +350,22 @@
                     
                     if (rel.chars && Array.isArray(rel.chars)) {
                         rel.chars.forEach(function(relId) {
-                            // Find the related character in the database
                             var relatedChar = allOCs.find(function(c) {
-                                var idToCheck = c.id || c.title.toLowerCase().replace(/\s+/g, '-');
+                                // Safely convert ID to lowercase here too!
+                                var idToCheck = c.id ? c.id.toLowerCase() : c.title.toLowerCase().replace(/\s+/g, '-');
                                 return idToCheck === relId.toLowerCase();
                             });
 
                             if (relatedChar) {
                                 var safeTitle = escapeHTML(relatedChar.title);
                                 var safeImg = escapeHTML(relatedChar.image);
-                                // Make the mini polaroid link to them!
                                 relHTML += `
-                                    <a href="/creations/character?char=${encodeURIComponent(relId)}" class="mini-polaroid">
+                                    <a href="/creations/character?char=${encodeURIComponent(relId.toLowerCase())}" class="mini-polaroid">
                                         <img src="${safeImg}" alt="${safeTitle}">
                                         <span>${safeTitle}</span>
                                     </a>
                                 `;
                             } else {
-                                // If character isn't made yet, show a placeholder
                                 relHTML += `
                                     <div class="mini-polaroid" style="cursor: default;">
                                         <div class="placeholder-img">?</div>
@@ -372,7 +375,7 @@
                             }
                         });
                     }
-                    relHTML += `</div>`; // close mini-roster
+                    relHTML += `</div>`;
                 });
                 
                 relContainer.innerHTML = relHTML;
@@ -380,7 +383,7 @@
                 relContainer.innerHTML = "loner.";
             }
 
-            // --- GALLERY RENDERING WITH OPTIONAL DESCRIPTIONS ---
+            // --- UN-CROPPED GALLERY RENDERING ---
             if (foundChar.gallery && foundChar.gallery.length > 0) {
                 document.getElementById('char-gallery-box').style.display = "block";
 
@@ -388,7 +391,6 @@
                 foundChar.gallery.forEach(function(item) {
                     var safeImg = escapeHTML(item.image);
                     var safeDesc = item.description ? escapeHTML(item.description) : "";
-
                     var captionHTML = safeDesc ? `<div class="gallery-caption">${safeDesc}</div>` : "";
 
                     galHTML += `

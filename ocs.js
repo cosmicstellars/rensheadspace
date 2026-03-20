@@ -35,7 +35,7 @@ var ocsHumanData = [
         ]
     }, // <-- notice the comma here! this separates the characters.
      {
-        "id": "Mizuki",
+        "id": "mizuki",
         "title": "Mizuki",
         "image": "/img/ocs/mizuki/icon.png",
 		"wip": true,
