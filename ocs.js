@@ -6,7 +6,7 @@ var ocsHumanData = [
 		"category": "the Soushi family",
 		"wip": false,
         
-        "age": "21",
+        "age": "25",
         "gender": "male",
         "pronouns": "he/him",
         "sexuality": "homosexual",
