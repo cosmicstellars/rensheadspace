@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ren's headspace - character profile</title>
+    
+    <link rel="stylesheet" href="https://cdn.cursors-4u.net/cursors/animated/shiny-grey-star-4a7c7422-32.css">
+    <link rel="stylesheet" href="/style.css?v=3">
+    <link rel="icon" type="image/png" href="/img/Icon.png">
+
+    <style>
+        .profile-btn {
+            background-color: #f7f9fa;
+            border: 1px dashed #b3b1f5;
+            color: #8e8cf0;
+            padding: 8px 20px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.1s;
+        }
+
+        .profile-btn:hover {
+            background-color: #b3b1f5;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .char-stat {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+            border-bottom: 1px dotted #e1e5e8;
+            padding-bottom: 5px;
+        }
+
+        .char-stat b {
+            color: #ff6b81;
+            font-weight: 900;
+            display: inline-block;
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="star-field"></div>
+
+    <div class="wrapper">
+        <div class="header">
+            <h1>ren's headspace</h1>
+        </div>
+
+        <div class="nav-bar">
+            [<a href="/" style="margin: 0 4px;">home</a>] 
+            [<a href="/creations" style="margin: 0 4px; color: #ff6b81; font-weight: bold;">art & ocs</a>] 
+            [<a href="/projects" style="margin: 0 4px;">games & dev</a>] 
+            [<a href="#" style="margin: 0 4px;">downloads</a>]
+        </div>
+
+        <div class="columns" id="profile-content" style="display: none;">
+            
+            <div class="left-col">
+                <div class="box">
+                    <div class="box-title" id="char-name">name</div>
+                    
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <img id="char-img" src="" style="width: 100%; max-width: 200px; border: 2px solid #d1d8dc; border-radius: 8px; background: #f7f9fa; object-fit: cover;">
+                    </div>
+                    
+                    <div class="char-stat"><b>age:</b> <span id="char-age">?</span></div>
+                    <div class="char-stat"><b>gender:</b> <span id="char-gender">?</span></div>
+                    <div class="char-stat"><b>pronouns:</b> <span id="char-pronouns">?</span></div>
+                    <div class="char-stat"><b>sexuality:</b> <span id="char-sexuality">?</span></div>
+                    <div class="char-stat" id="species-container" style="display: none;"><b>species:</b> <span id="char-species">?</span></div>
+                    
+                    <div style="margin-top: 20px; text-align: center;">
+                        <a href="#" id="char-gallery-btn" class="profile-btn">✦ view gallery ✦</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-col">
+                <div class="box">
+                    <div class="box-title">character lore</div>
+                    <div id="blog-feed">
+                        
+                        <div class="blog-entry">
+                            <div class="blog-header">
+                                <span class="blog-title">description</span>
+                            </div>
+                            <div class="blog-content" id="char-desc">
+                                </div>
+                        </div>
+
+                        <div class="blog-entry">
+                            <div class="blog-header">
+                                <span class="blog-title">backstory</span>
+                            </div>
+                            <div class="blog-content" id="char-backstory">
+                                </div>
+                        </div>
+
+                        <div class="blog-entry">
+                            <div class="blog-header">
+                                <span class="blog-title">relationships</span>
+                            </div>
+                            <div class="blog-content" id="char-relationships">
+                                </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-msg" style="text-align: center; margin-top: 50px; color: #ff6b81; font-weight: bold; display: none;">
+            error: character not found in database!
+        </div>
+    </div>
+
+    <script>
+        var starField = document.getElementById('star-field');
+        if (starField) {
+            for (var i = 0; i < 100; i++) {
+                var star = document.createElement('div');
+                star.className = 'bg-star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                var size = (Math.random() * 2 + 1) + 'px';
+                star.style.width = size; star.style.height = size;
+                star.style.animationDuration = (Math.random() * 3 + 1.5) + 's';
+                star.style.animationDelay = (Math.random() * 5) + 's';
+                starField.appendChild(star);
+            }
+        }
+    </script>
+
+    <script src="/ocs.js?v=2"></script>
+
+    <script>
+        // 1. Grab the character's name from the URL (e.g. ?char=ren)
+        var urlParams = new URLSearchParams(window.location.search);
+        var charQuery = urlParams.get('char');
+
+        // 2. Combine all your universes so we can search the whole list
+        var allOCs = [];
+        if (typeof ocsHumanData !== 'undefined') allOCs = allOCs.concat(ocsHumanData);
+        if (typeof ocsFantasyData !== 'undefined') allOCs = allOCs.concat(ocsFantasyData);
+
+        // 3. Find the character that matches the URL
+        var foundChar = null;
+        if (charQuery) {
+            foundChar = allOCs.find(function(c) {
+                var idToCheck = c.id || c.title.toLowerCase().replace(/\s+/g, '-');
+                return idToCheck === charQuery;
+            });
+        }
+
+        // 4. Fill the page with their info!
+        if (foundChar) {
+            document.getElementById('profile-content').style.display = 'flex';
+            
+            document.title = "ren's headspace - " + foundChar.title;
+            document.getElementById('char-name').innerText = foundChar.title;
+            document.getElementById('char-img').src = foundChar.image;
+            
+            // Left Column Stats
+            document.getElementById('char-age').innerText = foundChar.age || "unknown";
+            document.getElementById('char-gender').innerText = foundChar.gender || "unknown";
+            document.getElementById('char-pronouns').innerText = foundChar.pronouns || "any";
+            document.getElementById('char-sexuality').innerText = foundChar.sexuality || "unknown";
+            
+            if (foundChar.species) {
+                document.getElementById('char-species').innerText = foundChar.species;
+                document.getElementById('species-container').style.display = 'block';
+            }
+
+            // Right Column Lore
+            document.getElementById('char-desc').innerHTML = foundChar.description || "no description provided.";
+            document.getElementById('char-backstory').innerHTML = foundChar.backstory || "a mystery waiting to be uncovered...";
+            document.getElementById('char-relationships').innerHTML = foundChar.relationships || "loner.";
+
+            // Gallery Button
+            if (foundChar.gallery) {
+                document.getElementById('char-gallery-btn').href = foundChar.gallery;
+            } else {
+                document.getElementById('char-gallery-btn').style.display = "none";
+            }
+
+        } else {
+            document.getElementById('error-msg').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

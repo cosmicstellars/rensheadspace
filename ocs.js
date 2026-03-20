@@ -1,33 +1,24 @@
-// file: ocs.js
-
 var ocsHumanData = [
     {
+        "id": "ren",  // optional, but ensures the link works perfectly!
         "title": "ren",
         "image": "/img/creations/human-oc1.png",
-        "description": "just a regular guy.",
-        "category": "Main Cast" // this creates a header!
-    },
-    {
-        "title": "background bob",
-        "image": "/img/creations/human-oc2.png",
-        "description": "he has no category, so he will float at the top."
-        // leaving category blank is totally fine
+        "category": "Main Cast",
+        
+        // new stats!
+        "age": "19",
+        "gender": "male",
+        "pronouns": "he/him",
+        "sexuality": "bisexual",
+        
+        // new lore!
+        "description": "just a regular guy navigating the city. he loves video games and drawing.",
+        "backstory": "born in a quiet town, he moved to the big city to pursue his dreams of creating the ultimate interactive experience.",
+        "relationships": "best friends with <a href='/character.html?char=bob'>bob</a>. avoids jim at all costs.",
+        
+        // where their custom gallery lives
+        "gallery": "/gallery-ren.html"
     }
 ];
 
-var ocsFantasyData = [
-    {
-        "title": "elara",
-        "image": "/img/creations/fantasy-oc1.png",
-        "description": "she wields the power of the stars.",
-        "category": "The Rebellion",
-        "species": "Star Elf" // this will show up under her name!
-    },
-    {
-        "title": "grom",
-        "image": "/img/creations/fantasy-oc2.png",
-        "description": "he likes rocks.",
-        "category": "Villains",
-        "species": "Goblin"
-    }
-];
+// ... your fantasy array down here

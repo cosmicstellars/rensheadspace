@@ -19,25 +19,3 @@ var artData = [
         "description": ""
     }
 ];
-
-// 2. Human Universe OCs
-var ocsHumanData = [
-    /* template for when you are ready to add them:
-    {
-        "title": "character name",
-        "image": "/img/creations/human-oc.png",
-        "description": "all of their lore and details go right here!"
-    }
-    */
-];
-
-// 3. Fantasy Universe OCs
-var ocsFantasyData = [
-    /* template for when you are ready to add them:
-    {
-        "title": "character name",
-        "image": "/img/creations/fantasy-oc.png",
-        "description": "all of their lore and details go right here!"
-    }
-    */
-];

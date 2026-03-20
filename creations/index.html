@@ -108,10 +108,10 @@
             display: block;
         }
 
-        /* --- NEW: POLAROID CARD STYLES --- */
+        /* --- SMALLER, RETRO POLAROID CARD STYLES --- */
         .oc-category-title {
             text-align: center;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 900;
             color: #ff6b81;
             margin: 40px 0 20px 0;
@@ -123,42 +123,43 @@
         .oc-roster {
             display: flex;
             flex-wrap: wrap;
-            gap: 25px;
+            gap: 20px;
             justify-content: center;
             margin-bottom: 40px;
         }
 
         .polaroid {
             background: #ffffff;
-            padding: 12px 12px 20px 12px;
-            border: 1px solid #e1e5e8;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
-            width: 220px;
+            padding: 8px 8px 16px 8px; /* tighter padding */
+            border: 1px solid #d1d8dc;
+            box-shadow: 3px 3px 0px #e1e5e8; /* hard-edged classic drop shadow! */
+            width: 140px; /* much smaller and cuter! */
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.1s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
+            text-decoration: none; 
         }
 
         .polaroid:hover {
-            transform: translateY(-5px) rotate(1deg);
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+            transform: translate(-2px, -2px); /* pops up neatly */
+            box-shadow: 5px 5px 0px #b3b1f5; /* shifts to lavender shadow! */
             border-color: #b3b1f5;
         }
 
         .polaroid-img {
             width: 100%;
-            height: 200px;
+            height: 140px; /* perfect square */
             object-fit: cover;
             border: 1px solid #f0f4f8;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             background-color: #f7f9fa;
         }
 
         .polaroid-name {
-            font-size: 18px;
+            font-size: 15px; /* scaled down text */
             font-weight: 900;
             color: #4a4a4a;
             margin: 0 0 5px 0;
@@ -166,21 +167,13 @@
         }
 
         .polaroid-species {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
             color: #ff6b81;
-            margin: 0 0 10px 0;
+            margin: 0;
             opacity: 0.8;
             text-transform: lowercase;
             letter-spacing: 1px;
-        }
-
-        .polaroid-desc {
-            font-size: 13px;
-            color: #666;
-            margin: 0;
-            line-height: 1.5;
-            font-weight: 700;
         }
     </style>
 </head>
@@ -369,7 +362,6 @@
             container.innerHTML = gridHTML;
         };
 
-        // --- UPDATED: ALL INFO DRAWN DIRECTLY ON THE CARDS ---
         window.renderRoster = function(dataArray, containerId) {
             var container = document.getElementById(containerId);
             if (!container) return;
@@ -400,19 +392,19 @@
                 groupedData[category].forEach(function(item) {
                     var safeTitle = escapeHTML(item.title);
                     var safeImg = escapeHTML(item.image);
-                    var safeDesc = escapeHTML(item.description);
                     var safeSpecies = item.species ? escapeHTML(item.species) : "";
                     
                     var speciesHtml = safeSpecies ? `<p class="polaroid-species">✦ ${safeSpecies} ✦</p>` : "";
+                    
+                    var charId = item.id || safeTitle.toLowerCase().replace(/\s+/g, '-');
 
-                    // Clicking the card now opens the standard lightbox!
+                    // Link now correctly drops the .html extension!
                     html += `
-                        <div class="polaroid" onclick="window.openLightbox('${safeTitle.replace(/'/g, "\\'")}', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}')">
+                        <a href="/creations/character?char=${encodeURIComponent(charId)}" class="polaroid" style="text-decoration: none;">
                             <img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">
                             <h3 class="polaroid-name">${safeTitle}</h3>
                             ${speciesHtml}
-                            <p class="polaroid-desc">${safeDesc}</p>
-                        </div>
+                        </a>
                     `;
                 });
                 
