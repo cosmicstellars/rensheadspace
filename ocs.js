@@ -29,7 +29,7 @@ var ocsHumanData = [
                 "image": "/img/ocs/seiichi/gallery/render.png",   
             },
             {
-                "image": "/img/ocs/seiichi/gallery/veemodraw.png" 
+                "image": "/img/ocs/seiichi/gallery/veemodraw.png",
                 "description": "drawing by veemo"
             }
         ]
