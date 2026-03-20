@@ -20,44 +20,35 @@
             text-transform: lowercase;
         }
 
-        /* --- NEW: TAB SWITCHER STYLES --- */
+        /* --- TUMBLR/MYSPACE STYLE TABS --- */
         .tab-container {
             text-align: center;
-            margin: 20px 0;
+            margin: 15px 0 25px 0;
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 20px;
         }
 
         .tab-btn {
-            background-color: #f7f9fa;
-            border: 2px solid #d1d8dc;
+            background: none;
+            border: none;
             color: #8382ad;
-            padding: 8px 24px;
             font-family: 'Nunito', sans-serif;
-            font-weight: 900;
-            font-size: 16px;
-            border-radius: 20px;
+            font-weight: 800;
+            font-size: 15px;
             cursor: pointer;
-            transition: all 0.1s;
+            padding: 5px 10px;
+            transition: color 0.1s;
         }
 
         .tab-btn:hover {
-            border-color: #8e8cf0;
             color: #8e8cf0;
         }
 
+        /* simple dotted underline for the active tab */
         .tab-btn.active {
-            background-color: #8e8cf0;
-            color: #ffffff;
-            border-color: #8e8cf0;
-            box-shadow: 0 4px 0px #6c6ad0;
-            transform: translateY(-2px);
-        }
-
-        .tab-btn.active:active {
-            transform: translateY(2px);
-            box-shadow: 0 0px 0px #6c6ad0;
+            color: #ff6b81;
+            border-bottom: 2px dotted #ff6b81;
         }
 
         /* hide sections by default */
@@ -208,8 +199,8 @@
         </div>
 
         <div class="tab-container">
-            <button class="tab-btn active" id="btn-art" onclick="switchTab('art')">art gallery</button>
-            <button class="tab-btn" id="btn-ocs" onclick="switchTab('ocs')">characters</button>
+            <button class="tab-btn active" id="btn-art" onclick="switchTab('art')">gallery</button>
+            <button class="tab-btn" id="btn-ocs" onclick="switchTab('ocs')">ocs</button>
         </div>
 
         <div id="section-art" class="page-section active">
@@ -285,17 +276,14 @@
     <script>
         // --- TAB SWITCHER LOGIC ---
         function switchTab(tabId) {
-            // change button colors
             document.getElementById('btn-art').classList.remove('active');
             document.getElementById('btn-ocs').classList.remove('active');
             document.getElementById('btn-' + tabId).classList.add('active');
 
-            // show/hide sections
             document.getElementById('section-art').classList.remove('active');
             document.getElementById('section-ocs').classList.remove('active');
             document.getElementById('section-' + tabId).classList.add('active');
 
-            // clear search bar when switching to avoid confusion
             document.getElementById('search-bar').value = '';
             filterGallery();
         }
@@ -315,7 +303,7 @@
             });
         }
 
-        // --- ART GALLERY LOGIC ---
+        // --- ART LOGIC ---
         var lightbox = document.getElementById('lightbox');
         var lbImg = document.getElementById('lightbox-img');
         var lbTitle = document.getElementById('lightbox-title');
@@ -360,8 +348,7 @@
             container.innerHTML = gridHTML;
         };
 
-
-        // --- OC ROSTER & VIEWER LOGIC ---
+        // --- OC LOGIC ---
         var viewerBox = document.getElementById('main-oc-viewer');
         var viewerImg = document.getElementById('viewer-img');
         var viewerName = document.getElementById('viewer-name');
@@ -406,8 +393,7 @@
             container.innerHTML = html;
         };
 
-
-        // --- SEARCH FILTER ---
+        // --- FILTER LOGIC ---
         window.filterGallery = function() {
             var query = document.getElementById('search-bar').value.toLowerCase();
             
@@ -435,7 +421,7 @@
             viewerBox.style.display = 'none';
         };
 
-        // --- INITIAL LOAD ---
+        // --- LOAD ---
         if (typeof artData !== 'undefined') { window.renderArt(artData); } 
         if (typeof ocsHumanData !== 'undefined') { window.renderRoster(ocsHumanData, 'roster-human'); } 
         if (typeof ocsFantasyData !== 'undefined') { window.renderRoster(ocsFantasyData, 'roster-fantasy'); }
