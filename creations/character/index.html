@@ -10,15 +10,19 @@
     <link rel="icon" type="image/png" href="/img/Icon.png">
 
     <style>
+        html {
+            scroll-behavior: smooth; /* makes the "view gallery" button scroll down smoothly! */
+        }
+
+        /* --- THEME-MATCHED BUTTON --- */
         .profile-btn {
-            background-color: #f7f9fa;
-            border: 1px dashed #b3b1f5;
-            color: #8e8cf0;
+            background-color: rgba(51, 50, 82, 0.6);
+            border: 1px solid #48476e;
+            color: #d0d0e6;
             padding: 8px 20px;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 900;
-            font-size: 14px;
-            border-radius: 20px;
+            font-family: Verdana, Tahoma, sans-serif;
+            font-weight: bold;
+            font-size: 11px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
@@ -26,28 +30,40 @@
         }
 
         .profile-btn:hover {
-            background-color: #b3b1f5;
-            color: #ffffff;
-            transform: translateY(-2px);
+            border-color: #8e8cf0;
+            background-color: rgba(92, 90, 138, 0.6);
+            color: #fff;
+            transform: translate(-2px, -2px);
+            box-shadow: 2px 2px 0px #5c5a8a;
         }
 
+        /* --- THEME-MATCHED STATS --- */
         .char-stat {
             margin: 5px 0;
-            font-size: 14px;
-            color: #555;
-            border-bottom: 1px dotted #e1e5e8;
+            font-size: 11px;
+            color: #d0d0e6;
+            border-bottom: 1px dotted #48476e;
             padding-bottom: 5px;
         }
 
         .char-stat b {
-            color: #ff6b81;
-            font-weight: 900;
+            color: #c4c3f5;
+            font-weight: bold;
             display: inline-block;
             width: 80px;
         }
     </style>
 </head>
 <body>
+
+    <div id="lightbox" onclick="closeLightbox(event)">
+        <button id="lightbox-close" onclick="closeLightbox(event)" title="Close">✖</button>
+        <div id="lightbox-content-box">
+            <img id="lightbox-img" src="" alt="Creation Image">
+            <div id="lightbox-title"></div>
+            <div id="lightbox-desc"></div>
+        </div>
+    </div>
 
     <div id="star-field"></div>
 
@@ -58,7 +74,7 @@
 
         <div class="nav-bar">
             [<a href="/" style="margin: 0 4px;">home</a>] 
-            [<a href="/creations" style="margin: 0 4px; color: #ff6b81; font-weight: bold;">art & ocs</a>] 
+            [<a href="/creations" style="margin: 0 4px; color: #8e8cf0; font-weight: bold;">art & ocs</a>] 
             [<a href="/projects" style="margin: 0 4px;">games & dev</a>] 
             [<a href="#" style="margin: 0 4px;">downloads</a>]
         </div>
@@ -70,7 +86,7 @@
                     <div class="box-title" id="char-name">name</div>
                     
                     <div style="text-align: center; margin-bottom: 15px;">
-                        <img id="char-img" src="" style="width: 100%; max-width: 200px; border: 2px solid #d1d8dc; border-radius: 8px; background: #f7f9fa; object-fit: cover;">
+                        <img id="char-img" src="" style="width: 100%; max-width: 200px; border: 1px solid #48476e; background-color: #1e1d30; object-fit: cover;">
                     </div>
                     
                     <div class="char-stat"><b>age:</b> <span id="char-age">?</span></div>
@@ -80,7 +96,7 @@
                     <div class="char-stat" id="species-container" style="display: none;"><b>species:</b> <span id="char-species">?</span></div>
                     
                     <div style="margin-top: 20px; text-align: center;">
-                        <a href="#" id="char-gallery-btn" class="profile-btn">✦ view gallery ✦</a>
+                        <a href="#char-gallery-box" id="char-gallery-btn" class="profile-btn">view gallery</a>
                     </div>
                 </div>
             </div>
@@ -94,32 +110,38 @@
                             <div class="blog-header">
                                 <span class="blog-title">description</span>
                             </div>
-                            <div class="blog-content" id="char-desc">
-                                </div>
+                            <div class="blog-content" id="char-desc"></div>
                         </div>
 
                         <div class="blog-entry">
                             <div class="blog-header">
                                 <span class="blog-title">backstory</span>
                             </div>
-                            <div class="blog-content" id="char-backstory">
-                                </div>
+                            <div class="blog-content" id="char-backstory"></div>
                         </div>
 
                         <div class="blog-entry">
                             <div class="blog-header">
                                 <span class="blog-title">relationships</span>
                             </div>
-                            <div class="blog-content" id="char-relationships">
-                                </div>
+                            <div class="blog-content" id="char-relationships"></div>
                         </div>
 
                     </div>
                 </div>
+
+                <div class="box" id="char-gallery-box" style="display: none;">
+                    <div class="box-title">gallery</div>
+                    <div class="gallery-container">
+                        <div class="gallery-grid" id="char-gallery-feed">
+                            </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <div id="error-msg" style="text-align: center; margin-top: 50px; color: #ff6b81; font-weight: bold; display: none;">
+        <div id="error-msg" style="text-align: center; margin-top: 50px; color: #8e8cf0; font-weight: bold; display: none;">
             error: character not found in database!
         </div>
     </div>
@@ -144,16 +166,47 @@
     <script src="/ocs.js?v=2"></script>
 
     <script>
-        // 1. Grab the character's name from the URL (e.g. ?char=ren)
+        // --- Lightbox Functions ---
+        var lightbox = document.getElementById('lightbox');
+        var lbImg = document.getElementById('lightbox-img');
+        var lbTitle = document.getElementById('lightbox-title');
+        var lbDesc = document.getElementById('lightbox-desc');
+
+        window.openLightbox = function(title, imgUrl, desc) {
+            lbImg.src = imgUrl;
+            lbTitle.innerText = title;
+            lbDesc.innerText = desc;
+            lightbox.style.display = 'flex';
+        };
+
+        window.closeLightbox = function(event) {
+            if (event.target === lightbox || event.target.id === 'lightbox-close') {
+                lightbox.style.display = 'none';
+            }
+        };
+
+        function escapeHTML(str) {
+            if (!str) return "";
+            return str.replace(/[&<>"']/g, function(match) {
+                switch (match) {
+                    case '&': return '&amp;';
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '"': return '&quot;';
+                    case "'": return '&#039;';
+                    default: return match;
+                }
+            });
+        }
+
+        // --- Character Loading Logic ---
         var urlParams = new URLSearchParams(window.location.search);
         var charQuery = urlParams.get('char');
 
-        // 2. Combine all your universes so we can search the whole list
         var allOCs = [];
         if (typeof ocsHumanData !== 'undefined') allOCs = allOCs.concat(ocsHumanData);
         if (typeof ocsFantasyData !== 'undefined') allOCs = allOCs.concat(ocsFantasyData);
 
-        // 3. Find the character that matches the URL
         var foundChar = null;
         if (charQuery) {
             foundChar = allOCs.find(function(c) {
@@ -162,7 +215,6 @@
             });
         }
 
-        // 4. Fill the page with their info!
         if (foundChar) {
             document.getElementById('profile-content').style.display = 'flex';
             
@@ -170,7 +222,7 @@
             document.getElementById('char-name').innerText = foundChar.title;
             document.getElementById('char-img').src = foundChar.image;
             
-            // Left Column Stats
+            // Left Column
             document.getElementById('char-age').innerText = foundChar.age || "unknown";
             document.getElementById('char-gender').innerText = foundChar.gender || "unknown";
             document.getElementById('char-pronouns').innerText = foundChar.pronouns || "any";
@@ -181,14 +233,30 @@
                 document.getElementById('species-container').style.display = 'block';
             }
 
-            // Right Column Lore
+            // Right Column
             document.getElementById('char-desc').innerHTML = foundChar.description || "no description provided.";
             document.getElementById('char-backstory').innerHTML = foundChar.backstory || "a mystery waiting to be uncovered...";
             document.getElementById('char-relationships').innerHTML = foundChar.relationships || "loner.";
 
-            // Gallery Button
-            if (foundChar.gallery) {
-                document.getElementById('char-gallery-btn').href = foundChar.gallery;
+            // Gallery Rendering
+            if (foundChar.gallery && foundChar.gallery.length > 0) {
+                document.getElementById('char-gallery-btn').style.display = "inline-block";
+                document.getElementById('char-gallery-box').style.display = "block";
+
+                var galHTML = '';
+                foundChar.gallery.forEach(function(item) {
+                    var safeTitle = escapeHTML(item.title || "untitled");
+                    var safeImg = escapeHTML(item.image);
+                    var safeDesc = escapeHTML(item.description || "");
+
+                    galHTML += `
+                        <div class="gallery-item" onclick="window.openLightbox('${safeTitle.replace(/'/g, "\\'")}', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}')">
+                            <img src="${safeImg}" class="gallery-thumb" alt="${safeTitle}">
+                            <div class="gallery-title">${safeTitle}</div>
+                        </div>
+                    `;
+                });
+                document.getElementById('char-gallery-feed').innerHTML = galHTML;
             } else {
                 document.getElementById('char-gallery-btn').style.display = "none";
             }
