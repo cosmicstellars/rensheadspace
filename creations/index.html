@@ -10,17 +10,7 @@
     <link rel="icon" type="image/png" href="/img/Icon.png">
 
     <style>
-        .section-title {
-            text-align: center;
-            font-size: 20px;
-            font-weight: 900;
-            color: #8e8cf0;
-            margin: 30px 0 15px 0;
-            letter-spacing: 1px;
-            text-transform: lowercase;
-        }
-
-        /* --- TUMBLR/MYSPACE STYLE TABS --- */
+        /* --- THEME-MATCHED TABS --- */
         .tab-container {
             text-align: center;
             margin: 15px 0 25px 0;
@@ -33,21 +23,21 @@
             background: none;
             border: none;
             color: #8382ad;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 800;
-            font-size: 15px;
+            font-family: Verdana, Tahoma, sans-serif;
+            font-weight: bold;
+            font-size: 12px;
             cursor: pointer;
             padding: 5px 10px;
             transition: color 0.1s;
         }
 
         .tab-btn:hover {
-            color: #8e8cf0;
+            color: #c4c3f5;
         }
 
         .tab-btn.active {
-            color: #b3b1f5;
-            border-bottom: 2px dotted #b3b1f5;
+            color: #8e8cf0;
+            border-bottom: 2px dotted #8e8cf0;
         }
 
         .page-section {
@@ -64,7 +54,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- STYLIZED RETRO UNIVERSE TAGS --- */
+        /* --- THEME-MATCHED UNIVERSE TAGS --- */
         .universe-toggle {
             display: flex;
             justify-content: center;
@@ -73,12 +63,12 @@
         }
 
         .uni-btn {
-            background-color: #ffffff;
-            border: 1px solid #d1d8dc;
-            color: #8382ad;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 800;
-            font-size: 12px;
+            background-color: rgba(51, 50, 82, 0.6);
+            border: 1px solid #48476e;
+            color: #d0d0e6;
+            font-family: Verdana, Tahoma, sans-serif;
+            font-weight: bold;
+            font-size: 11px;
             letter-spacing: 1px;
             cursor: pointer;
             padding: 6px 14px;
@@ -86,16 +76,16 @@
         }
 
         .uni-btn:hover {
-            border-color: #b3b1f5;
-            background-color: #f4f3ff;
-            color: #8e8cf0;
+            border-color: #8e8cf0;
+            background-color: rgba(92, 90, 138, 0.6);
+            color: #fff;
         }
 
         .uni-btn.active {
-            background-color: #b3b1f5;
-            color: #ffffff;
-            border-color: #b3b1f5;
-            box-shadow: 2px 2px 0px #8e8cf0; 
+            background-color: #8e8cf0;
+            color: #0b0b14;
+            border-color: #8e8cf0;
+            box-shadow: 2px 2px 0px #5c5a8a; 
             transform: translate(-2px, -2px);
         }
 
@@ -108,14 +98,14 @@
             display: block;
         }
 
-        /* --- SMALLER, RETRO POLAROID CARD STYLES --- */
+        /* --- THEME-MATCHED POLAROID CARDS --- */
         .oc-category-title {
             text-align: center;
             font-size: 14px;
-            font-weight: 900;
-            color: #ff6b81;
+            font-weight: bold;
+            color: #c4c3f5;
             margin: 40px 0 20px 0;
-            border-bottom: 1px dashed #ffb8b8;
+            border-bottom: 1px dashed #5c5a8a;
             display: block;
             padding-bottom: 5px;
         }
@@ -129,13 +119,13 @@
         }
 
         .polaroid {
-            background: #ffffff;
-            padding: 8px 8px 16px 8px; /* tighter padding */
-            border: 1px solid #d1d8dc;
-            box-shadow: 3px 3px 0px #e1e5e8; /* hard-edged classic drop shadow! */
-            width: 140px; /* much smaller and cuter! */
+            background-color: rgba(51, 50, 82, 0.6);
+            padding: 8px 8px 16px 8px; 
+            border: 1px solid #48476e;
+            box-shadow: 3px 3px 0px rgba(5, 5, 10, 0.8); 
+            width: 140px; 
             cursor: pointer;
-            transition: all 0.1s ease;
+            transition: all 0.15s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -144,34 +134,33 @@
         }
 
         .polaroid:hover {
-            transform: translate(-2px, -2px); /* pops up neatly */
-            box-shadow: 5px 5px 0px #b3b1f5; /* shifts to lavender shadow! */
-            border-color: #b3b1f5;
+            transform: translate(-2px, -2px); 
+            box-shadow: 5px 5px 0px #5c5a8a; 
+            border-color: #8e8cf0;
+            background-color: rgba(92, 90, 138, 0.6);
         }
 
         .polaroid-img {
             width: 100%;
-            height: 140px; /* perfect square */
+            height: 140px; 
             object-fit: cover;
-            border: 1px solid #f0f4f8;
+            border: 1px dotted #5c5a8a;
             margin-bottom: 10px;
-            background-color: #f7f9fa;
+            background-color: #1e1d30;
         }
 
         .polaroid-name {
-            font-size: 15px; /* scaled down text */
-            font-weight: 900;
-            color: #4a4a4a;
+            font-size: 13px; 
+            font-weight: bold;
+            color: #c4c3f5;
             margin: 0 0 5px 0;
             line-height: 1.2;
         }
 
         .polaroid-species {
             font-size: 10px;
-            font-weight: 800;
-            color: #ff6b81;
+            color: #8e8cf0;
             margin: 0;
-            opacity: 0.8;
             text-transform: lowercase;
             letter-spacing: 1px;
         }
@@ -197,14 +186,14 @@
 
         <div class="nav-bar">
             [<a href="/" style="margin: 0 4px;">home</a>] 
-            [<a href="/creations" style="margin: 0 4px;">art & ocs</a>] 
+            [<a href="/creations" style="margin: 0 4px; color: #8e8cf0;">art & ocs</a>] 
             [<a href="/projects" style="margin: 0 4px;">games & dev</a>] 
             [<a href="#" style="margin: 0 4px;">downloads</a>]
         </div>
 
         <div class="search-container">
             <span class="search-prompt">&gt;</span>
-            <input type="text" id="search-bar" placeholder="search..." onkeyup="filterGallery()">
+            <input type="text" id="search-bar" placeholder="query database..." onkeyup="filterGallery()">
         </div>
 
         <div class="tab-container">
@@ -227,13 +216,13 @@
 
             <div id="uni-human" class="universe-section active">
                 <div id="roster-human-container">
-                    <p style="color: #8382ad; font-size: 13px; text-align: center;">loading roster...</p>
+                    <p style="color: #8382ad; font-size: 11px; text-align: center;">loading roster...</p>
                 </div>
             </div>
 
             <div id="uni-fantasy" class="universe-section">
                 <div id="roster-fantasy-container">
-                    <p style="color: #8382ad; font-size: 13px; text-align: center;">loading roster...</p>
+                    <p style="color: #8382ad; font-size: 11px; text-align: center;">loading roster...</p>
                 </div>
             </div>
             
@@ -278,7 +267,7 @@
     </script>
 
     <script src="/creations.js?v=6"></script>
-    <script src="/ocs.js?v=3"></script>
+    <script src="/ocs.js?v=2"></script>
 
     <script>
         function switchTab(tabId) {
@@ -362,12 +351,13 @@
             container.innerHTML = gridHTML;
         };
 
+        // --- RENDER ROSTER: NATIVELY MATCHES STYLE.CSS, NO STARS ---
         window.renderRoster = function(dataArray, containerId) {
             var container = document.getElementById(containerId);
             if (!container) return;
 
             if (!dataArray || dataArray.length === 0) {
-                container.innerHTML = '<p style="color: #8382ad; font-size: 13px; text-align: center;">no characters here yet.</p>';
+                container.innerHTML = '<p style="color: #8382ad; font-size: 11px; text-align: center;">no characters here yet.</p>';
                 return;
             }
 
@@ -384,7 +374,7 @@
             
             for (var category in groupedData) {
                 if (category !== "uncategorized") {
-                    html += `<div class="oc-category-title">✦ ${escapeHTML(category)} ✦</div>`;
+                    html += `<div class="oc-category-title">${escapeHTML(category)}</div>`;
                 }
 
                 html += `<div class="oc-roster">`;
@@ -394,13 +384,12 @@
                     var safeImg = escapeHTML(item.image);
                     var safeSpecies = item.species ? escapeHTML(item.species) : "";
                     
-                    var speciesHtml = safeSpecies ? `<p class="polaroid-species">✦ ${safeSpecies} ✦</p>` : "";
+                    var speciesHtml = safeSpecies ? `<p class="polaroid-species">${safeSpecies}</p>` : "";
                     
                     var charId = item.id || safeTitle.toLowerCase().replace(/\s+/g, '-');
 
-                    // Link now correctly drops the .html extension!
                     html += `
-                        <a href="/creations/character?char=${encodeURIComponent(charId)}" class="polaroid" style="text-decoration: none;">
+                        <a href="/creations/character?char=${encodeURIComponent(charId)}" class="polaroid">
                             <img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">
                             <h3 class="polaroid-name">${safeTitle}</h3>
                             ${speciesHtml}
