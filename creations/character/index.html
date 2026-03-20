@@ -10,33 +10,6 @@
     <link rel="icon" type="image/png" href="/img/Icon.png">
 
     <style>
-        html {
-            scroll-behavior: smooth; /* makes the "view gallery" button scroll down smoothly! */
-        }
-
-        /* --- THEME-MATCHED BUTTON --- */
-        .profile-btn {
-            background-color: rgba(51, 50, 82, 0.6);
-            border: 1px solid #48476e;
-            color: #d0d0e6;
-            padding: 8px 20px;
-            font-family: Verdana, Tahoma, sans-serif;
-            font-weight: bold;
-            font-size: 11px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.1s;
-        }
-
-        .profile-btn:hover {
-            border-color: #8e8cf0;
-            background-color: rgba(92, 90, 138, 0.6);
-            color: #fff;
-            transform: translate(-2px, -2px);
-            box-shadow: 2px 2px 0px #5c5a8a;
-        }
-
         /* --- THEME-MATCHED STATS --- */
         .char-stat {
             margin: 5px 0;
@@ -51,6 +24,42 @@
             font-weight: bold;
             display: inline-block;
             width: 80px;
+        }
+
+        /* --- HORIZONTAL SCROLLING GALLERY --- */
+        .horizontal-gallery {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 15px;
+            padding-bottom: 15px; /* room for the custom scrollbar */
+            
+            /* firefox scrollbar styling */
+            scrollbar-width: thin;
+            scrollbar-color: #8e8cf0 rgba(51, 50, 82, 0.6);
+        }
+
+        /* chrome/edge/safari scrollbar styling */
+        .horizontal-gallery::-webkit-scrollbar {
+            height: 8px;
+        }
+        .horizontal-gallery::-webkit-scrollbar-track {
+            background: rgba(51, 50, 82, 0.6);
+            border-radius: 4px;
+            border: 1px solid #48476e;
+        }
+        .horizontal-gallery::-webkit-scrollbar-thumb {
+            background-color: #8e8cf0;
+            border-radius: 4px;
+        }
+        .horizontal-gallery::-webkit-scrollbar-thumb:hover {
+            background-color: #c4c3f5;
+        }
+
+        /* lock the width of the items so they don't squish */
+        .horizontal-gallery .gallery-item {
+            flex: 0 0 auto;
+            width: 150px; 
         }
     </style>
 </head>
@@ -94,10 +103,6 @@
                     <div class="char-stat"><b>pronouns:</b> <span id="char-pronouns">?</span></div>
                     <div class="char-stat"><b>sexuality:</b> <span id="char-sexuality">?</span></div>
                     <div class="char-stat" id="species-container" style="display: none;"><b>species:</b> <span id="char-species">?</span></div>
-                    
-                    <div style="margin-top: 20px; text-align: center;">
-                        <a href="#char-gallery-box" id="char-gallery-btn" class="profile-btn">view gallery</a>
-                    </div>
                 </div>
             </div>
 
@@ -120,7 +125,7 @@
                             <div class="blog-content" id="char-backstory"></div>
                         </div>
 
-                        <div class="blog-entry">
+                        <div class="blog-entry" style="margin-bottom: 10px;">
                             <div class="blog-header">
                                 <span class="blog-title">relationships</span>
                             </div>
@@ -132,10 +137,8 @@
 
                 <div class="box" id="char-gallery-box" style="display: none;">
                     <div class="box-title">gallery</div>
-                    <div class="gallery-container">
-                        <div class="gallery-grid" id="char-gallery-feed">
-                            </div>
-                    </div>
+                    <div class="horizontal-gallery" id="char-gallery-feed">
+                        </div>
                 </div>
 
             </div>
@@ -163,7 +166,7 @@
         }
     </script>
 
-    <script src="/ocs.js?v=2"></script>
+    <script src="/ocs.js?v=3"></script>
 
     <script>
         // --- Lightbox Functions ---
@@ -240,7 +243,6 @@
 
             // Gallery Rendering
             if (foundChar.gallery && foundChar.gallery.length > 0) {
-                document.getElementById('char-gallery-btn').style.display = "inline-block";
                 document.getElementById('char-gallery-box').style.display = "block";
 
                 var galHTML = '';
@@ -257,8 +259,6 @@
                     `;
                 });
                 document.getElementById('char-gallery-feed').innerHTML = galHTML;
-            } else {
-                document.getElementById('char-gallery-btn').style.display = "none";
             }
 
         } else {
