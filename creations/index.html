@@ -95,7 +95,6 @@
             background-color: #b3b1f5;
             color: #ffffff;
             border-color: #b3b1f5;
-            /* classic retro hard-edge drop shadow! */
             box-shadow: 2px 2px 0px #8e8cf0; 
             transform: translate(-2px, -2px);
         }
@@ -110,7 +109,7 @@
         }
 
 
-        /* --- OC STYLES --- */
+        /* --- OC VIEWER STYLES --- */
         .oc-viewer {
             display: none;
             background: #ffffff;
@@ -151,10 +150,19 @@
         }
 
         .oc-viewer-name {
-            margin: 0 0 10px 0;
+            margin: 0 0 5px 0;
             font-size: 24px;
             color: #4a4a4a;
             font-weight: 900;
+        }
+
+        .oc-viewer-species {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            color: #ff6b81;
+            font-weight: 800;
+            text-transform: lowercase;
+            letter-spacing: 1px;
         }
 
         .oc-viewer-desc {
@@ -165,34 +173,76 @@
             font-weight: 700;
         }
 
+        /* --- NEW: POLAROID ROSTER STYLES --- */
+        .oc-category-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: #ff6b81;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px dashed #ffb8b8;
+            display: block;
+            padding-bottom: 5px;
+        }
+
         .oc-roster {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
             margin-bottom: 30px;
         }
 
-        .oc-icon {
-            width: 75px;
-            height: 75px;
-            border-radius: 50%;
-            border: 3px solid #d1d8dc;
-            object-fit: cover;
+        .polaroid {
+            background: #ffffff;
+            padding: 8px 8px 12px 8px;
+            border: 1px solid #e1e5e8;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+            width: 100px;
             cursor: pointer;
-            transition: transform 0.1s, border-color 0.1s;
-            background: #fff;
+            transition: all 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .oc-icon:hover {
-            transform: translateY(-5px) scale(1.1);
-            border-color: #8e8cf0;
-            box-shadow: 0 5px 10px rgba(142, 140, 240, 0.3);
-        }
-
-        .oc-icon.active {
+        .polaroid:hover {
+            transform: translateY(-4px) rotate(2deg);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
             border-color: #b3b1f5;
-            box-shadow: 0 0 0 4px #e1e0fb;
+        }
+
+        .polaroid.active {
+            border-color: #8e8cf0;
+            box-shadow: 3px 3px 0px #b3b1f5;
+            transform: translate(-2px, -2px);
+        }
+
+        .polaroid-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 1px solid #f0f4f8;
+            margin-bottom: 8px;
+            background-color: #f7f9fa;
+        }
+
+        .polaroid-name {
+            font-size: 13px;
+            font-weight: 900;
+            color: #4a4a4a;
+            text-align: center;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .polaroid-species {
+            font-size: 10px;
+            font-weight: 800;
+            color: #8382ad;
+            text-align: center;
+            margin: 2px 0 0 0;
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -249,20 +299,21 @@
                     <img src="" id="viewer-img" class="oc-viewer-portrait">
                     <div class="oc-viewer-info">
                         <h2 class="oc-viewer-name" id="viewer-name">Name</h2>
+                        <div class="oc-viewer-species" id="viewer-species"></div>
                         <p class="oc-viewer-desc" id="viewer-desc">Lore goes here...</p>
                     </div>
                 </div>
             </div>
 
             <div id="uni-human" class="universe-section active">
-                <div class="oc-roster" id="roster-human">
-                    <p style="color: #8382ad; font-size: 13px;">loading roster...</p>
+                <div id="roster-human-container">
+                    <p style="color: #8382ad; font-size: 13px; text-align: center;">loading roster...</p>
                 </div>
             </div>
 
             <div id="uni-fantasy" class="universe-section">
-                <div class="oc-roster" id="roster-fantasy">
-                    <p style="color: #8382ad; font-size: 13px;">loading roster...</p>
+                <div id="roster-fantasy-container">
+                    <p style="color: #8382ad; font-size: 13px; text-align: center;">loading roster...</p>
                 </div>
             </div>
             
@@ -307,10 +358,9 @@
     </script>
 
     <script src="/creations.js?v=6"></script>
-    <script src="/ocs.js?v=1"></script>
+    <script src="/ocs.js?v=2"></script>
 
     <script>
-        // --- TAB SWITCHER LOGIC ---
         function switchTab(tabId) {
             document.getElementById('btn-art').classList.remove('active');
             document.getElementById('btn-ocs').classList.remove('active');
@@ -324,7 +374,6 @@
             filterGallery();
         }
 
-        // --- UNIVERSE SWITCHER LOGIC ---
         function switchUniverse(uniId) {
             document.getElementById('btn-uni-human').classList.remove('active');
             document.getElementById('btn-uni-fantasy').classList.remove('active');
@@ -335,11 +384,10 @@
             document.getElementById('uni-' + uniId).classList.add('active');
 
             document.getElementById('main-oc-viewer').style.display = 'none';
-            var allIcons = document.querySelectorAll('.oc-icon');
+            var allIcons = document.querySelectorAll('.polaroid');
             allIcons.forEach(icon => icon.classList.remove('active'));
         }
 
-        // XSS Sanitizer
         function escapeHTML(str) {
             if (!str) return "";
             return str.replace(/[&<>"']/g, function(match) {
@@ -354,7 +402,6 @@
             });
         }
 
-        // --- ART LOGIC ---
         var lightbox = document.getElementById('lightbox');
         var lbImg = document.getElementById('lightbox-img');
         var lbTitle = document.getElementById('lightbox-title');
@@ -399,20 +446,29 @@
             container.innerHTML = gridHTML;
         };
 
-        // --- OC LOGIC ---
+        // --- NEW CATEGORIZED POLAROID LOGIC ---
         var viewerBox = document.getElementById('main-oc-viewer');
         var viewerImg = document.getElementById('viewer-img');
         var viewerName = document.getElementById('viewer-name');
+        var viewerSpecies = document.getElementById('viewer-species');
         var viewerDesc = document.getElementById('viewer-desc');
 
-        window.selectOC = function(title, imgUrl, desc, iconElement) {
+        window.selectOC = function(title, imgUrl, desc, species, iconElement) {
             viewerImg.src = imgUrl;
             viewerName.innerText = title;
             viewerDesc.innerText = desc;
             
+            // if they have a species, show it in the viewer!
+            if (species && species !== "undefined" && species.trim() !== "") {
+                viewerSpecies.innerText = "✦ " + species + " ✦";
+                viewerSpecies.style.display = "block";
+            } else {
+                viewerSpecies.style.display = "none";
+            }
+            
             viewerBox.style.display = 'block';
 
-            var allIcons = document.querySelectorAll('.oc-icon');
+            var allIcons = document.querySelectorAll('.polaroid');
             allIcons.forEach(icon => icon.classList.remove('active'));
             iconElement.classList.add('active');
         };
@@ -422,29 +478,54 @@
             if (!container) return;
 
             if (!dataArray || dataArray.length === 0) {
-                container.innerHTML = '<p style="color: #8382ad; font-size: 13px;">no characters here yet.</p>';
+                container.innerHTML = '<p style="color: #8382ad; font-size: 13px; text-align: center;">no characters here yet.</p>';
                 return;
             }
 
-            var html = '';
+            // Step 1: Group characters by category
+            var groupedData = {};
             dataArray.forEach(function(item) {
-                var safeTitle = escapeHTML(item.title);
-                var safeImg = escapeHTML(item.image);
-                var safeDesc = escapeHTML(item.description);
-                var iconId = 'icon-' + Math.random().toString(36).substr(2, 9);
-
-                html += `
-                    <img src="${safeImg}" 
-                         id="${iconId}"
-                         class="oc-icon" 
-                         title="${safeTitle}" 
-                         onclick="window.selectOC('${safeTitle.replace(/'/g, "\\'")}', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}', this)">
-                `;
+                var cat = item.category || "uncategorized";
+                if (!groupedData[cat]) {
+                    groupedData[cat] = [];
+                }
+                groupedData[cat].push(item);
             });
+
+            // Step 2: Build the HTML
+            var html = '';
+            
+            for (var category in groupedData) {
+                // Print a category header if it's not uncategorized
+                if (category !== "uncategorized") {
+                    html += `<div class="oc-category-title">${escapeHTML(category)}</div>`;
+                }
+
+                html += `<div class="oc-roster">`;
+                
+                groupedData[category].forEach(function(item) {
+                    var safeTitle = escapeHTML(item.title);
+                    var safeImg = escapeHTML(item.image);
+                    var safeDesc = escapeHTML(item.description);
+                    var safeSpecies = item.species ? escapeHTML(item.species) : "";
+                    
+                    var speciesHtml = safeSpecies ? `<p class="polaroid-species">${safeSpecies}</p>` : "";
+
+                    html += `
+                        <div class="polaroid" onclick="window.selectOC('${safeTitle.replace(/'/g, "\\'")}', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}', '${safeSpecies.replace(/'/g, "\\'")}', this)">
+                            <img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">
+                            <p class="polaroid-name">${safeTitle}</p>
+                            ${speciesHtml}
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+
             container.innerHTML = html;
         };
 
-        // --- FILTER LOGIC ---
         window.filterGallery = function() {
             var query = document.getElementById('search-bar').value.toLowerCase();
             
@@ -457,25 +538,25 @@
 
             if (typeof ocsHumanData !== 'undefined') {
                 var filteredHuman = ocsHumanData.filter(function(item) {
-                    return item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query);
+                    return item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query) || (item.category && item.category.toLowerCase().includes(query));
                 });
-                window.renderRoster(filteredHuman, 'roster-human');
+                window.renderRoster(filteredHuman, 'roster-human-container');
             }
 
             if (typeof ocsFantasyData !== 'undefined') {
                 var filteredFantasy = ocsFantasyData.filter(function(item) {
-                    return item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query);
+                    return item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query) || (item.category && item.category.toLowerCase().includes(query)) || (item.species && item.species.toLowerCase().includes(query));
                 });
-                window.renderRoster(filteredFantasy, 'roster-fantasy');
+                window.renderRoster(filteredFantasy, 'roster-fantasy-container');
             }
 
             viewerBox.style.display = 'none';
         };
 
-        // --- LOAD ---
+        // --- INITIAL LOAD ---
         if (typeof artData !== 'undefined') { window.renderArt(artData); } 
-        if (typeof ocsHumanData !== 'undefined') { window.renderRoster(ocsHumanData, 'roster-human'); } 
-        if (typeof ocsFantasyData !== 'undefined') { window.renderRoster(ocsFantasyData, 'roster-fantasy'); }
+        if (typeof ocsHumanData !== 'undefined') { window.renderRoster(ocsHumanData, 'roster-human-container'); } 
+        if (typeof ocsFantasyData !== 'undefined') { window.renderRoster(ocsFantasyData, 'roster-fantasy-container'); }
         
     </script>
 
