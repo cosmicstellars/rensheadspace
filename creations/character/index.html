@@ -26,7 +26,6 @@
             width: 80px;
         }
 
-        /* --- STYLIZED NAME --- */
         .character-name-header {
             text-align: center; 
             color: #8e8cf0; 
@@ -37,39 +36,123 @@
             text-shadow: 0 0 5px #5c5a8a;
         }
 
+        /* --- RELATIONSHIP SUBCATEGORIES & MINI POLAROIDS --- */
+        .rel-category {
+            font-size: 10px;
+            color: #8382ad; 
+            text-transform: lowercase;
+            letter-spacing: 1px;
+            margin: 10px 0 8px 0;
+            font-weight: bold;
+            border-bottom: 1px dashed #48476e;
+            padding-bottom: 2px;
+            display: inline-block;
+        }
+
+        .mini-roster {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .mini-polaroid {
+            background-color: rgba(51, 50, 82, 0.6);
+            padding: 5px 5px 8px 5px; 
+            border: 1px solid #48476e;
+            width: 70px; /* tiny! */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.1s ease;
+        }
+
+        .mini-polaroid:hover {
+            border-color: #8e8cf0;
+            background-color: rgba(92, 90, 138, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .mini-polaroid img {
+            width: 100%;
+            height: 70px;
+            object-fit: cover;
+            border: 1px dotted #5c5a8a;
+            margin-bottom: 5px;
+            background-color: #1e1d30;
+        }
+
+        .mini-polaroid span {
+            font-size: 9px;
+            font-weight: bold;
+            color: #c4c3f5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        /* missing character placeholder */
+        .mini-polaroid .placeholder-img {
+            width: 100%;
+            height: 70px;
+            border: 1px dotted #5c5a8a;
+            margin-bottom: 5px;
+            background-color: #0b0b14;
+            color: #48476e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+
         /* --- FULL-WIDTH HORIZONTAL SCROLLING GALLERY --- */
         .horizontal-gallery {
             display: flex;
             flex-wrap: nowrap;
             overflow-x: auto;
+            justify-content: center; 
             gap: 15px;
             padding-bottom: 15px; 
-            
-            /* firefox scrollbar */
             scrollbar-width: thin;
             scrollbar-color: #8e8cf0 rgba(51, 50, 82, 0.6);
         }
 
-        /* chrome/edge/safari scrollbar */
-        .horizontal-gallery::-webkit-scrollbar {
-            height: 8px;
-        }
-        .horizontal-gallery::-webkit-scrollbar-track {
-            background: rgba(51, 50, 82, 0.6);
-            border-radius: 4px;
-            border: 1px solid #48476e;
-        }
-        .horizontal-gallery::-webkit-scrollbar-thumb {
-            background-color: #8e8cf0;
-            border-radius: 4px;
-        }
-        .horizontal-gallery::-webkit-scrollbar-thumb:hover {
-            background-color: #c4c3f5;
-        }
+        .horizontal-gallery::-webkit-scrollbar { height: 8px; }
+        .horizontal-gallery::-webkit-scrollbar-track { background: rgba(51, 50, 82, 0.6); border-radius: 4px; border: 1px solid #48476e; }
+        .horizontal-gallery::-webkit-scrollbar-thumb { background-color: #8e8cf0; border-radius: 4px; }
+        .horizontal-gallery::-webkit-scrollbar-thumb:hover { background-color: #c4c3f5; }
 
         .horizontal-gallery .gallery-item {
             flex: 0 0 auto;
-            width: 160px; /* slightly wider now that we have full screen space! */
+            width: 160px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .horizontal-gallery .gallery-thumb {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border: 1px dotted #5c5a8a;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .horizontal-gallery .gallery-item:hover .gallery-thumb {
+            border: 1px solid #8e8cf0;
+        }
+
+        /* optional gallery description text */
+        .gallery-caption {
+            font-size: 10px;
+            color: #8382ad;
+            text-align: center;
+            line-height: 1.3;
         }
     </style>
 </head>
@@ -148,7 +231,9 @@
                         </div>
                     </div>
                 </div>
-            </div> <div class="box" id="char-gallery-box" style="display: none; width: 100%; box-sizing: border-box;">
+            </div> 
+            
+            <div class="box" id="char-gallery-box" style="display: none; width: 100%; box-sizing: border-box;">
                 <div class="box-title">gallery</div>
                 <div class="horizontal-gallery" id="char-gallery-feed">
                     </div>
@@ -178,7 +263,7 @@
         }
     </script>
 
-    <script src="/ocs.js?v=3"></script>
+    <script src="/ocs.js?v=4"></script>
 
     <script>
         var lightbox = document.getElementById('lightbox');
@@ -229,7 +314,7 @@
         }
 
         if (foundChar) {
-            document.getElementById('profile-content').style.display = 'block'; // Changed to block to stack the gallery!
+            document.getElementById('profile-content').style.display = 'block'; 
             
             document.title = "ren's headspace - " + foundChar.title;
             document.getElementById('char-name').innerText = foundChar.title;
@@ -247,22 +332,69 @@
 
             document.getElementById('char-desc').innerHTML = foundChar.description || "no description provided.";
             document.getElementById('char-backstory').innerHTML = foundChar.backstory || "a mystery waiting to be uncovered...";
-            document.getElementById('char-relationships').innerHTML = foundChar.relationships || "loner.";
+            
+            // --- AUTOMATIC MINI-POLAROID RELATIONSHIPS ---
+            var relContainer = document.getElementById('char-relationships');
+            if (foundChar.relationships && Array.isArray(foundChar.relationships)) {
+                var relHTML = '';
+                
+                foundChar.relationships.forEach(function(rel) {
+                    var safeCat = escapeHTML(rel.category);
+                    relHTML += `<div class="rel-category">${safeCat}</div>`;
+                    relHTML += `<div class="mini-roster">`;
+                    
+                    if (rel.chars && Array.isArray(rel.chars)) {
+                        rel.chars.forEach(function(relId) {
+                            // Find the related character in the database
+                            var relatedChar = allOCs.find(function(c) {
+                                var idToCheck = c.id || c.title.toLowerCase().replace(/\s+/g, '-');
+                                return idToCheck === relId.toLowerCase();
+                            });
 
-            // Gallery Rendering
+                            if (relatedChar) {
+                                var safeTitle = escapeHTML(relatedChar.title);
+                                var safeImg = escapeHTML(relatedChar.image);
+                                // Make the mini polaroid link to them!
+                                relHTML += `
+                                    <a href="/creations/character?char=${encodeURIComponent(relId)}" class="mini-polaroid">
+                                        <img src="${safeImg}" alt="${safeTitle}">
+                                        <span>${safeTitle}</span>
+                                    </a>
+                                `;
+                            } else {
+                                // If character isn't made yet, show a placeholder
+                                relHTML += `
+                                    <div class="mini-polaroid" style="cursor: default;">
+                                        <div class="placeholder-img">?</div>
+                                        <span>${escapeHTML(relId)}</span>
+                                    </div>
+                                `;
+                            }
+                        });
+                    }
+                    relHTML += `</div>`; // close mini-roster
+                });
+                
+                relContainer.innerHTML = relHTML;
+            } else {
+                relContainer.innerHTML = "loner.";
+            }
+
+            // --- GALLERY RENDERING WITH OPTIONAL DESCRIPTIONS ---
             if (foundChar.gallery && foundChar.gallery.length > 0) {
                 document.getElementById('char-gallery-box').style.display = "block";
 
                 var galHTML = '';
                 foundChar.gallery.forEach(function(item) {
-                    var safeTitle = escapeHTML(item.title || "untitled");
                     var safeImg = escapeHTML(item.image);
-                    var safeDesc = escapeHTML(item.description || "");
+                    var safeDesc = item.description ? escapeHTML(item.description) : "";
+
+                    var captionHTML = safeDesc ? `<div class="gallery-caption">${safeDesc}</div>` : "";
 
                     galHTML += `
-                        <div class="gallery-item" onclick="window.openLightbox('${safeTitle.replace(/'/g, "\\'")}', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}')">
-                            <img src="${safeImg}" class="gallery-thumb" alt="${safeTitle}">
-                            <div class="gallery-title">${safeTitle}</div>
+                        <div class="gallery-item" onclick="window.openLightbox('', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}')">
+                            <img src="${safeImg}" class="gallery-thumb" alt="gallery image">
+                            ${captionHTML}
                         </div>
                     `;
                 });

@@ -164,6 +164,27 @@
             text-transform: lowercase;
             letter-spacing: 1px;
         }
+
+        /* --- NEW: WORK IN PROGRESS (WIP) CARDS --- */
+        .polaroid.wip {
+            cursor: not-allowed;
+            opacity: 0.6; /* Faded out to show they aren't ready */
+            filter: grayscale(0.4);
+        }
+
+        .polaroid.wip:hover {
+            transform: none; /* disables the popup hover effect */
+            box-shadow: 3px 3px 0px rgba(5, 5, 10, 0.8); /* keeps standard shadow */
+            border-color: #48476e;
+            background-color: rgba(51, 50, 82, 0.6);
+        }
+        
+        .wip-tag {
+            font-size: 9px;
+            color: #8382ad;
+            font-weight: normal;
+            margin-left: 3px;
+        }
     </style>
 </head>
 <body>
@@ -351,7 +372,6 @@
             container.innerHTML = gridHTML;
         };
 
-        // --- RENDER ROSTER: NATIVELY MATCHES STYLE.CSS, NO STARS ---
         window.renderRoster = function(dataArray, containerId) {
             var container = document.getElementById(containerId);
             if (!container) return;
@@ -385,16 +405,28 @@
                     var safeSpecies = item.species ? escapeHTML(item.species) : "";
                     
                     var speciesHtml = safeSpecies ? `<p class="polaroid-species">${safeSpecies}</p>` : "";
-                    
                     var charId = item.id || safeTitle.toLowerCase().replace(/\s+/g, '-');
 
-                    html += `
-                        <a href="/creations/character?char=${encodeURIComponent(charId)}" class="polaroid">
-                            <img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">
-                            <h3 class="polaroid-name">${safeTitle}</h3>
-                            ${speciesHtml}
-                        </a>
-                    `;
+                    // --- NEW WIP LOGIC ---
+                    // If they are a WIP, they get a faded card and NO link!
+                    if (item.wip) {
+                        html += `
+                            <div class="polaroid wip">
+                                <img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">
+                                <h3 class="polaroid-name">${safeTitle} <span class="wip-tag">(wip)</span></h3>
+                                ${speciesHtml}
+                            </div>
+                        `;
+                    } else {
+                        // Standard link logic for finished characters
+                        html += `
+                            <a href="/creations/character?char=${encodeURIComponent(charId)}" class="polaroid">
+                                <img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">
+                                <h3 class="polaroid-name">${safeTitle}</h3>
+                                ${speciesHtml}
+                            </a>
+                        `;
+                    }
                 });
                 
                 html += `</div>`;
