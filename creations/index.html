@@ -45,19 +45,16 @@
             color: #8e8cf0;
         }
 
-        /* changed to a soft light lavender! */
         .tab-btn.active {
             color: #b3b1f5;
             border-bottom: 2px dotted #b3b1f5;
         }
 
-        /* hide sections by default */
         .page-section {
             display: none;
             animation: fadeIn 0.3s ease;
         }
 
-        /* show active section */
         .page-section.active {
             display: block;
         }
@@ -67,29 +64,56 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- OC STYLES --- */
-        .universe-title {
-            text-align: center;
-            font-size: 16px;
+        /* --- FIXED: TUMBLR-STYLE UNIVERSE TOGGLES --- */
+        .universe-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            color: #8382ad;
+        }
+
+        .uni-btn {
+            background: none;
+            border: none;
+            color: #8382ad;
+            font-family: 'Nunito', sans-serif;
             font-weight: 800;
-            color: #ff6b81;
-            margin: 20px 0 10px 0;
-            border-bottom: 2px dashed #ffb8b8;
-            display: inline-block;
-            padding-bottom: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 2px 6px;
+            transition: color 0.1s;
         }
 
-        .universe-container {
-            text-align: center;
+        .uni-btn:hover {
+            color: #8e8cf0;
         }
 
+        .uni-btn.active {
+            color: #b3b1f5;
+            border-bottom: 2px dashed #b3b1f5; /* cute dashed line instead of dotted! */
+        }
+
+        .universe-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .universe-section.active {
+            display: block;
+        }
+
+
+        /* --- OC STYLES --- */
         .oc-viewer {
             display: none;
             background: #ffffff;
             border: 3px solid #8e8cf0;
             border-radius: 12px;
             padding: 20px;
-            margin: 20px auto;
+            margin: 20px auto 30px auto;
             max-width: 600px;
             box-shadow: 0 8px 20px rgba(142, 140, 240, 0.2);
             text-align: left;
@@ -163,8 +187,8 @@
         }
 
         .oc-icon.active {
-            border-color: #ff6b81;
-            box-shadow: 0 0 0 4px #ffb8b8;
+            border-color: #b3b1f5;
+            box-shadow: 0 0 0 4px #e1e0fb;
         }
     </style>
 </head>
@@ -210,6 +234,12 @@
         </div>
 
         <div id="section-ocs" class="page-section">
+            
+            <div class="universe-toggle">
+                * <button class="uni-btn active" id="btn-uni-human" onclick="switchUniverse('human')">human universe</button> |
+                <button class="uni-btn" id="btn-uni-fantasy" onclick="switchUniverse('fantasy')">fantasy universe</button> *
+            </div>
+
             <div class="oc-viewer" id="main-oc-viewer">
                 <div class="oc-viewer-inner">
                     <img src="" id="viewer-img" class="oc-viewer-portrait">
@@ -220,17 +250,18 @@
                 </div>
             </div>
 
-            <div class="universe-container">
-                <div class="universe-title">human universe</div>
+            <div id="uni-human" class="universe-section active">
                 <div class="oc-roster" id="roster-human">
                     <p style="color: #8382ad; font-size: 13px;">loading roster...</p>
                 </div>
+            </div>
 
-                <div class="universe-title" style="margin-top: 10px;">fantasy universe</div>
+            <div id="uni-fantasy" class="universe-section">
                 <div class="oc-roster" id="roster-fantasy">
                     <p style="color: #8382ad; font-size: 13px;">loading roster...</p>
                 </div>
             </div>
+            
         </div>
         
         <br><br>
@@ -271,7 +302,8 @@
         });
     </script>
 
-    <script src="/creations.js?v=5"></script>
+    <script src="/creations.js?v=6"></script>
+    <script src="/ocs.js?v=1"></script>
 
     <script>
         // --- TAB SWITCHER LOGIC ---
@@ -286,6 +318,21 @@
 
             document.getElementById('search-bar').value = '';
             filterGallery();
+        }
+
+        // --- NEW: UNIVERSE SWITCHER LOGIC ---
+        function switchUniverse(uniId) {
+            document.getElementById('btn-uni-human').classList.remove('active');
+            document.getElementById('btn-uni-fantasy').classList.remove('active');
+            document.getElementById('btn-uni-' + uniId).classList.add('active');
+
+            document.getElementById('uni-human').classList.remove('active');
+            document.getElementById('uni-fantasy').classList.remove('active');
+            document.getElementById('uni-' + uniId).classList.add('active');
+
+            document.getElementById('main-oc-viewer').style.display = 'none';
+            var allIcons = document.querySelectorAll('.oc-icon');
+            allIcons.forEach(icon => icon.classList.remove('active'));
         }
 
         // XSS Sanitizer
