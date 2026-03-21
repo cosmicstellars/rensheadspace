@@ -216,20 +216,38 @@
 
         #lightbox-img {
             max-width: 90vw;
-            max-height: 85vh; 
+            max-height: 80vh; /* slightly shorter to make room for text */
             width: auto !important; 
             height: auto !important;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
             border: 1px solid #48476e; 
         }
 
-        #lightbox-title, #lightbox-desc {
+        #lightbox-title {
             background: rgba(30, 29, 48, 0.9); 
             border: 1px dotted #48476e;
             padding: 5px 10px;
             margin-top: 8px;
             text-align: center;
             max-width: 100%;
+            font-weight: bold;
+            color: #c4c3f5;
+        }
+
+        /* FIXED: Scrolling description box! */
+        #lightbox-desc {
+            background: rgba(30, 29, 48, 0.9); 
+            border: 1px dotted #48476e;
+            padding: 10px 15px;
+            margin-top: 5px;
+            text-align: left; /* Left-aligned is much easier to read for long text */
+            max-width: 100%;
+            max-height: 15vh; /* Stops it from growing out of control */
+            overflow-y: auto; /* Adds a scrollbar if the text is too long! */
+            color: #d0d0e6;
+            line-height: 1.4;
+            scrollbar-width: thin;
+            scrollbar-color: #8e8cf0 transparent;
         }
     </style>
 </head>
@@ -378,11 +396,22 @@
         var lbImg = document.getElementById('lightbox-img');
         var lbTitle = document.getElementById('lightbox-title');
         var lbDesc = document.getElementById('lightbox-desc');
+        var currentGalleryData = []; // NEW: Stores the current array so we don't have to pass massive strings
 
-        window.openLightbox = function(title, imgUrl, desc) {
-            lbImg.src = imgUrl;
-            lbTitle.innerText = title;
-            lbDesc.innerText = desc;
+        // FIXED: Now takes an index number instead of giant HTML strings!
+        window.openLightbox = function(index) {
+            var item = currentGalleryData[index];
+            if (!item) return;
+
+            lbImg.src = item.image;
+            lbTitle.innerText = item.title || "";
+            
+            // Use innerHTML instead of innerText so your <br> tags actually render!
+            lbDesc.innerHTML = item.description || "";
+
+            lbTitle.style.display = item.title ? 'block' : 'none';
+            lbDesc.style.display = item.description ? 'block' : 'none';
+
             lightbox.style.display = 'flex';
         };
 
@@ -396,19 +425,21 @@
             var container = document.getElementById('art-feed');
             if (!container) return;
 
+            currentGalleryData = dataArray; // Saves the current list for the lightbox
+
             if (!dataArray || dataArray.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #8382ad; margin-top: 20px;">no art found.</p>';
                 return;
             }
 
             var gridHTML = '<div class="gallery-grid">';
-            dataArray.forEach(function(item) {
+            dataArray.forEach(function(item, index) { // We get the index number here now
                 var safeTitle = escapeHTML(item.title);
                 var safeImg = escapeHTML(item.image);
-                var safeDesc = escapeHTML(item.description);
 
+                // Now we just pass the index to the click function! Super clean.
                 gridHTML += `
-                    <div class="gallery-item" onclick="window.openLightbox('${safeTitle.replace(/'/g, "\\'")}', '${safeImg.replace(/'/g, "\\'")}', '${safeDesc.replace(/'/g, "\\'")}')">
+                    <div class="gallery-item" onclick="window.openLightbox(${index})">
                         <img src="${safeImg}" class="gallery-thumb" alt="${safeTitle}">
                         <div class="gallery-title">${safeTitle}</div>
                     </div>
@@ -453,7 +484,6 @@
                     var speciesHtml = safeSpecies ? `<p class="polaroid-species">${safeSpecies}</p>` : "";
                     var charId = item.id || safeTitle.toLowerCase().replace(/\s+/g, '-');
 
-                    // --- NEW: Conditionally show image OR placeholder ---
                     var imageHtml = safeImg ? `<img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">` : `<div class="polaroid-placeholder">?</div>`;
 
                     if (item.wip) {
