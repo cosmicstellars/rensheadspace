@@ -62,5 +62,46 @@ var ocsHumanData = [
 ];
 
 var ocsFantasyData = [
-    // your magic/fantasy characters will go in here, formatted the exact same way!
+    {
+        "id": "lysander",
+        "title": "Lysander",
+        "species": "Vampire",
+        "image": "",
+        "wip": true
+    },
+    {
+        "id": "unknown-demon",
+        "title": "???",
+        "species": "Demon",
+        "image": "",
+        "wip": true
+    },
+    {
+        "id": "drayden",
+        "title": "Drayden",
+        "species": "Dragon",
+        "image": "",
+        "wip": true
+    },
+    {
+        "id": "unknown-vampire",
+        "title": "???",
+        "species": "Vampire",
+        "image": "",
+        "wip": true
+    },
+    {
+        "id": "nova",
+        "title": "Nova",
+        "species": "Alien",
+        "image": "",
+        "wip": true
+    },
+    {
+        "id": "unknown-sorcerer",
+        "title": "???",
+        "species": "Sorcerer",
+        "image": "",
+        "wip": true
+    }
 ];
