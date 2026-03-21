@@ -149,6 +149,21 @@
             background-color: #1e1d30;
         }
 
+        /* --- NEW: PLACEHOLDER FOR MISSING ROSTER IMAGES --- */
+        .polaroid-placeholder {
+            width: 100%;
+            height: 140px; 
+            border: 1px dotted #5c5a8a;
+            margin-bottom: 10px;
+            background-color: #0b0b14;
+            color: #48476e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+        }
+
         .polaroid-name {
             font-size: 13px; 
             font-weight: bold;
@@ -165,16 +180,16 @@
             letter-spacing: 1px;
         }
 
-        /* --- NEW: WORK IN PROGRESS (WIP) CARDS --- */
+        /* --- WORK IN PROGRESS (WIP) CARDS --- */
         .polaroid.wip {
             cursor: not-allowed;
-            opacity: 0.6; /* Faded out to show they aren't ready */
+            opacity: 0.6; 
             filter: grayscale(0.4);
         }
 
         .polaroid.wip:hover {
-            transform: none; /* disables the popup hover effect */
-            box-shadow: 3px 3px 0px rgba(5, 5, 10, 0.8); /* keeps standard shadow */
+            transform: none; 
+            box-shadow: 3px 3px 0px rgba(5, 5, 10, 0.8); 
             border-color: #48476e;
             background-color: rgba(51, 50, 82, 0.6);
         }
@@ -188,9 +203,9 @@
 
         /* --- LIGHTBOX OVERRIDES --- */
         #lightbox-content-box {
-            width: fit-content !important; /* forces the box to hug the image exactly */
+            width: fit-content !important; 
             max-width: 95vw;
-            background: transparent !important; /* removes the bulky background box entirely */
+            background: transparent !important; 
             border: none !important;
             padding: 0 !important;
             margin: auto;
@@ -201,14 +216,13 @@
 
         #lightbox-img {
             max-width: 90vw;
-            max-height: 85vh; /* keeps tall images from going off-screen */
+            max-height: 85vh; 
             width: auto !important; 
             height: auto !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* optional: gives the image a nice floating shadow since the box is gone */
-            border: 1px solid #48476e; /* optional: adds a subtle border to the image itself */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+            border: 1px solid #48476e; 
         }
 
-        /* gives the text a tiny background so it's still readable over the dark overlay */
         #lightbox-title, #lightbox-desc {
             background: rgba(30, 29, 48, 0.9); 
             border: 1px dotted #48476e;
@@ -240,7 +254,7 @@
         <div class="nav-bar">
             [<a href="/" style="margin: 0 4px;">home</a>] 
             [<a href="/creations" style="margin: 0 4px; color: #8e8cf0;">creations & ocs</a>] 
-            [<a href="/projects" style="margin: 0 4px;">games & projects</a>] 
+            [<a href="/projects" style="margin: 0 4px;">games & dev</a>] 
             [<a href="#" style="margin: 0 4px;">downloads</a>]
         </div>
 
@@ -319,8 +333,8 @@
         });
     </script>
 
-    <script src="/creations.js?v=7"></script>
-    <script src="/ocs.js?v=8"></script>
+    <script src="/creations.js?v=6"></script>
+    <script src="/ocs.js?v=6"></script>
 
     <script>
         function switchTab(tabId) {
@@ -439,21 +453,21 @@
                     var speciesHtml = safeSpecies ? `<p class="polaroid-species">${safeSpecies}</p>` : "";
                     var charId = item.id || safeTitle.toLowerCase().replace(/\s+/g, '-');
 
-                    // --- NEW WIP LOGIC ---
-                    // If they are a WIP, they get a faded card and NO link!
+                    // --- NEW: Conditionally show image OR placeholder ---
+                    var imageHtml = safeImg ? `<img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">` : `<div class="polaroid-placeholder">?</div>`;
+
                     if (item.wip) {
                         html += `
                             <div class="polaroid wip">
-                                <img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">
+                                ${imageHtml}
                                 <h3 class="polaroid-name">${safeTitle} <span class="wip-tag">(wip)</span></h3>
                                 ${speciesHtml}
                             </div>
                         `;
                     } else {
-                        // Standard link logic for finished characters
                         html += `
                             <a href="/creations/character?char=${encodeURIComponent(charId)}" class="polaroid">
-                                <img src="${safeImg}" class="polaroid-img" alt="${safeTitle}">
+                                ${imageHtml}
                                 <h3 class="polaroid-name">${safeTitle}</h3>
                                 ${speciesHtml}
                             </a>
