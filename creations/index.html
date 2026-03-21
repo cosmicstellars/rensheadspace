@@ -216,7 +216,7 @@
 
         #lightbox-img {
             max-width: 90vw;
-            max-height: 80vh; /* slightly shorter to make room for text */
+            max-height: 80vh; 
             width: auto !important; 
             height: auto !important;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
@@ -240,10 +240,10 @@
             border: 1px dotted #48476e;
             padding: 10px 15px;
             margin-top: 5px;
-            text-align: left; /* Left-aligned is much easier to read for long text */
+            text-align: left; 
             max-width: 100%;
-            max-height: 15vh; /* Stops it from growing out of control */
-            overflow-y: auto; /* Adds a scrollbar if the text is too long! */
+            max-height: 15vh; 
+            overflow-y: auto; 
             color: #d0d0e6;
             line-height: 1.4;
             scrollbar-width: thin;
@@ -396,9 +396,8 @@
         var lbImg = document.getElementById('lightbox-img');
         var lbTitle = document.getElementById('lightbox-title');
         var lbDesc = document.getElementById('lightbox-desc');
-        var currentGalleryData = []; // NEW: Stores the current array so we don't have to pass massive strings
+        var currentGalleryData = []; 
 
-        // FIXED: Now takes an index number instead of giant HTML strings!
         window.openLightbox = function(index) {
             var item = currentGalleryData[index];
             if (!item) return;
@@ -406,7 +405,6 @@
             lbImg.src = item.image;
             lbTitle.innerText = item.title || "";
             
-            // Use innerHTML instead of innerText so your <br> tags actually render!
             lbDesc.innerHTML = item.description || "";
 
             lbTitle.style.display = item.title ? 'block' : 'none';
@@ -425,19 +423,32 @@
             var container = document.getElementById('art-feed');
             if (!container) return;
 
-            currentGalleryData = dataArray; // Saves the current list for the lightbox
+            // NEW: Sorts the creations from newest to oldest by reading your dates!
+            var sortedArray = [...dataArray].sort(function(a, b) {
+                function parseDate(dateStr) {
+                    if (!dateStr) return 0;
+                    var parts = dateStr.split('.');
+                    // turns "MM.DD.YYYY" into a real date so math can compare them
+                    if (parts.length === 3) {
+                        return new Date(parts[2], parts[0] - 1, parts[1]).getTime();
+                    }
+                    return 0;
+                }
+                return parseDate(b.date) - parseDate(a.date);
+            });
 
-            if (!dataArray || dataArray.length === 0) {
+            currentGalleryData = sortedArray; // Updates the lightbox data to match the sorted list
+
+            if (!sortedArray || sortedArray.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #8382ad; margin-top: 20px;">no art found.</p>';
                 return;
             }
 
             var gridHTML = '<div class="gallery-grid">';
-            dataArray.forEach(function(item, index) { // We get the index number here now
+            sortedArray.forEach(function(item, index) { 
                 var safeTitle = escapeHTML(item.title);
                 var safeImg = escapeHTML(item.image);
 
-                // Now we just pass the index to the click function! Super clean.
                 gridHTML += `
                     <div class="gallery-item" onclick="window.openLightbox(${index})">
                         <img src="${safeImg}" class="gallery-thumb" alt="${safeTitle}">
@@ -518,7 +529,7 @@
                 var filteredArt = artData.filter(function(item) {
                     return item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query);
                 });
-                window.renderArt(filteredArt);
+                window.renderArt(filteredArt); // this will now auto-sort your searches too!
             }
 
             if (typeof ocsHumanData !== 'undefined') {
