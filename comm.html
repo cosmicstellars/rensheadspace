@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commission Sheet</title>
+    <style>
+        /* =========================================
+           Fonts
+           ========================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&display=swap');
+
+        /* Custom Font Import */
+        @font-face {
+            font-family: 'Handwriting Regular';
+            src: url('./fonts/Handwriting-Regular.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* Removes all default browser margins */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow-x: hidden; 
+        }
+
+        .commission-scene {
+            position: relative;
+            width: 100vw;  
+            height: 100vh; 
+            overflow: hidden;
+            perspective: 1200px; 
+        }
+
+        .scene-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+        }
+
+        /* Layer 1: Bottom */
+        .bg-layer {
+            z-index: 1;
+        }
+
+        /* Layer 2: Middle (Curtains) */
+        .curtain-layer {
+            z-index: 2;
+        }
+
+        /* Base styles shared across the visual character and props */
+        .character-layer, .sign-layer, .tipjar-layer {
+            position: absolute;
+            bottom: 0;
+            left: -7%; 
+            width: 55vw; 
+            height: auto; 
+        }
+
+        /* Layer 3: The Jester */
+        .character-layer {
+            z-index: 3; 
+        }
+
+        /* Layer 4: The Closed Sign (On top of Jester) */
+        .sign-layer {
+            z-index: 4;
+        }
+
+        /* Layer 5: The Tip Jar (Visual Only) */
+        .tipjar-layer {
+            z-index: 5;
+            pointer-events: none; 
+        }
+
+        /* Layer 6: The Custom Hitbox for Tip Jar */
+        .custom-hitbox {
+            position: absolute;
+            z-index: 6;
+            cursor: pointer;
+            bottom: 27%;
+            left: 28%;
+            width: 4vw;
+            height: 14vh;
+        }
+
+        /* =========================================
+           Navigation Sign Group
+           ========================================= */
+        .sign-group {
+            position: absolute;
+            z-index: 4; 
+            bottom: 0%;
+            left: 3.8%; 
+            display: flex;
+            gap: 1vw; 
+        }
+
+        .nav-sign {
+            width: 12vw;
+            height: auto; 
+            cursor: pointer;
+            transform-origin: top center; 
+            transition: transform 0.4s ease-out; 
+        }
+
+        .nav-sign:hover {
+            animation: settle-swing 0.8s ease-in-out;
+        }
+
+        @keyframes settle-swing {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(4deg); }   
+            40% { transform: rotate(-3deg); }  
+            60% { transform: rotate(2deg); }   
+            80% { transform: rotate(-1deg); }  
+            100% { transform: rotate(0deg); }  
+        }
+
+        /* =========================================
+           Board & 3D Buttons
+           ========================================= */
+        .board-container {
+            position: absolute;
+            z-index: 4;
+            width: 25vw;
+            transform-style: preserve-3d; 
+            left: 80vw;
+            top: 51vh;
+            transform: scale(1.2);
+        }
+
+        .board-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            pointer-events: none; 
+        }
+
+        .board-button {
+            position: absolute;
+            padding: 10px;
+            font-family: 'Handwriting Regular', cursive, sans-serif; 
+            font-weight: normal; 
+            font-size: 2.2vw; 
+            color: #000000; 
+            text-transform: lowercase;
+            background: none;
+            border: none;
+            box-shadow: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            white-space: nowrap; 
+            min-width: 80px; 
+        }
+
+        .board-button::after {
+            content: '';
+            position: absolute;
+            width: calc(100% - 10px); 
+            height: 15px; 
+            bottom: -4px; 
+            left: 5px; 
+            background-image: url('./img/commissions/line.png'); 
+            background-size: 100% 100%; 
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0; 
+            transition: opacity 0.15s ease-in-out;
+            pointer-events: none; 
+        }
+
+        .board-button:hover::after, .board-button.active-btn::after {
+            opacity: 1; 
+        }
+
+        .board-button:active {
+            opacity: 0.5; 
+        }
+
+        /* Final Button Positions */
+        #btn-1 { text-align: center; left: 35%; top: 16%; transform: scale(1.4) translateZ(10px) rotateX(-21deg) rotateY(4deg) rotateZ(1deg); }
+        #btn-2 { text-align: center; left: 27%; top: 33%; transform: scale(1.4) translateZ(10px) rotateX(-11deg) rotateY(-1deg) rotateZ(4deg); }
+        #btn-3 { text-align: center; left: 30%; top: 51%; transform: scale(1.4) translateZ(10px) rotateX(-16deg) rotateY(3deg) rotateZ(6deg); }
+
+        /* =========================================
+           Content Box Area & Custom Scroll Arrows
+           ========================================= */
+        
+        #content-wrapper {
+            position: absolute;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            
+            gap: 1.5vh; 
+            
+            left: 51vw;
+            top: 7vh;
+            width: 31vw;
+            height: 84vh;
+        }
+
+        .scroll-arrow {
+            color: #ffffff; 
+            font-size: 2vw;
+            cursor: pointer;
+            padding: 5px;
+            user-select: none; 
+            
+            transform: scaleY(0.55); 
+            transition: transform 0.1s, opacity 0.2s, text-shadow 0.2s;
+            
+            line-height: 0.8;
+            opacity: 0.7;
+        }
+
+        .scroll-arrow:hover {
+            opacity: 1;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6); 
+            transform: scaleY(0.55); 
+        }
+
+        .scroll-arrow:active {
+            transform: scale(0.9, 0.5); 
+        }
+
+        #content-box {
+            flex-grow: 1;
+            width: 100%;
+            background: none; 
+            border: none;
+            color: #ffffff;
+            font-family: 'Handwriting Regular', cursive, sans-serif;
+            text-align: center;
+            
+            box-sizing: border-box;
+            
+            overflow-y: hidden; 
+            scroll-behavior: smooth; 
+            
+            padding: 1.5vw;
+            font-size: 1.7vw;
+        }
+
+        /* Styling the text inside the content box */
+        #content-box h2 {
+            font-family: 'Handwriting Regular', cursive, sans-serif;
+            margin-top: 0;
+            color: #ffffff; 
+            font-size: 2em;
+            letter-spacing: 2px;
+            font-weight: normal; 
+        }
+
+        #content-box p {
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        #content-box strong, #content-box b {
+            font-weight: bold;
+            color: #ffcc00; 
+        }
+
+        #content-box a {
+            color: #ffcc00;
+            text-decoration: underline;
+            text-decoration-thickness: 2px;
+            transition: opacity 0.2s;
+        }
+
+        #content-box a:hover {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="commission-scene">
+        <img src="./img/commissions/background.png" alt="Stage Background" class="scene-layer bg-layer">
+        
+        <img src="./img/commissions/jest.gif" alt="Jester Character" class="character-layer">
+        <img src="./img/commissions/signclosed.png" alt="Closed Sign" class="sign-layer">
+        <img src="./img/commissions/tipjar.png" alt="Tip Jar" class="tipjar-layer">
+        
+        <a href="https://ko-fi.com/cosmicstellars" class="custom-hitbox" target="_blank" rel="noopener noreferrer" aria-label="Tip Jar link to Ko-fi"></a>
+
+        <!-- CUSTOM SCROLL WRAPPER & TEXT CONTENT BOX -->
+        <div id="content-wrapper">
+            <div class="scroll-arrow" id="scroll-up">&#9650;</div> <!-- Up Triangle -->
+            
+            <div id="content-box">
+                <!-- Content injected here via JS -->
+            </div>
+            
+            <div class="scroll-arrow" id="scroll-down">&#9660;</div> <!-- Down Triangle -->
+        </div>
+
+        <!-- Board Section -->
+        <div class="board-container" id="board">
+            <img src="./img/commissions/board.png" alt="Board" class="board-image">
+            <button class="board-button" id="btn-1">info</button>
+            <button class="board-button" id="btn-2">examples</button>
+            <button class="board-button" id="btn-3">rules</button>
+        </div>
+
+        <div class="sign-group">
+            <a href="#commissions" aria-label="Go to Commissions">
+                <img src="./img/commissions/signcomms.png" alt="Commissions Information" class="nav-sign">
+            </a>
+            <a href="#downloads" aria-label="Go to Downloads">
+                <img src="./img/commissions/signdownloads.png" alt="Downloads" class="nav-sign">
+            </a>
+            <a href="#back" aria-label="Go Back">
+                <img src="./img/commissions/signgoback.png" alt="Go Back" class="nav-sign">
+            </a>
+        </div>
+
+        <img src="./img/commissions/curtains.png" alt="Red Curtains" class="scene-layer curtain-layer">
+    </div>
+
+    <!-- ===============================================================
+         INTERACTIVITY JS 
+         =============================================================== -->
+    <script>
+        /* --- 1. CUSTOM SCROLL LOGIC --- */
+        const contentBox = document.getElementById('content-box');
+        const scrollUpBtn = document.getElementById('scroll-up');
+        const scrollDownBtn = document.getElementById('scroll-down');
+        
+        // How many pixels to move per click
+        const scrollAmount = 150; 
+
+        scrollUpBtn.addEventListener('click', () => {
+            contentBox.scrollTop -= scrollAmount;
+        });
+
+        scrollDownBtn.addEventListener('click', () => {
+            contentBox.scrollTop += scrollAmount;
+        });
+
+        /* --- 2. CONTENT SWITCHING LOGIC --- */
+        const buttons = document.querySelectorAll('.board-button');
+
+        const sectionContent = {
+            'btn-1': `
+                <h2>info</h2>
+                <p>hihi! welcome to my commission hub :) this is where you'll be able to find <strong>examples of my work</strong>, the <strong>rules of my comms</strong> and <strong>downloads!</strong> ranging from hair edits to some models i make from time to time.</p>
+                <p>in the future, ill be also adding a tab for a shop but for now, if you wanna buy any models that im selling you can find them <a href="https://www.patreon.com/c/cosmicstellars" target="_blank" rel="noopener noreferrer">here!</a></p>
+                <p>the prices for my commissions are <strong>$20+</strong>, price <strong>depending on the complexity</strong> of the model. keep this in mind when contacting me for a commission!</p>
+                <p>after reading the rules and checking the examples, if you'd like to commission me, then contact me on <a href="https://discord.gg/unSYdyR4" target="_blank" rel="noopener noreferrer">Discord!</a></p>
+            `,
+            'btn-2': `<h2>examples</h2><p>here is where you can showcase your art!</p><p>[insert cool art images or text here]</p>`,
+            'btn-3': `<h2>rules</h2><p>1. payment upfront via ko-fi.<br>2. no refunds after the sketch phase.<br>3. turnaround time is usually 1-2 weeks.</p>`
+        };
+
+        function switchTab(buttonId) {
+            buttons.forEach(btn => btn.classList.remove('active-btn'));
+            document.getElementById(buttonId).classList.add('active-btn');
+
+            contentBox.style.opacity = 0;
+            setTimeout(() => {
+                contentBox.innerHTML = sectionContent[buttonId];
+                contentBox.style.opacity = 1;
+                contentBox.scrollTop = 0; 
+            }, 150); 
+        }
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                switchTab(e.target.id);
+            });
+        });
+
+        contentBox.style.transition = 'opacity 0.15s ease-in-out';
+        switchTab('btn-1'); 
+    </script>
+</body>
+</html>
