@@ -188,3 +188,89 @@ input[type=file]::file-selector-button:hover {
     background-color: #ffb6c1;
     color: #fff;
 }
+/* --- FFmpeg Modal Styles --- */
+.ffmpeg-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 192, 203, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.ffmpeg-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    border: 4px solid #ff69b4;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.ffmpeg-modal-content h2 {
+    color: #ff69b4;
+    margin-top: 0;
+    border-bottom: none;
+    font-size: 1.4rem;
+    font-weight: 900;
+}
+
+#ffmpegModalText {
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.ffmpeg-subtext {
+    font-size: 12px;
+    color: #888;
+}
+
+.ffmpeg-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-cancel {
+    background-color: #ccc;
+    box-shadow: 0 4px 15px rgba(200, 200, 200, 0.3);
+}
+
+.btn-cancel:hover {
+    background-color: #aaa;
+    box-shadow: 0 6px 20px rgba(170, 170, 170, 0.4);
+}
+
+.ffmpeg-progress-container {
+    display: none;
+    margin-top: 20px;
+}
+
+#ffmpegStatusText {
+    color: #ff69b4;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.ffmpeg-progress-bg {
+    width: 100%;
+    background: #ffe4e1;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+    border: 2px solid #ff69b4;
+}
+
+.ffmpeg-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #ff69b4;
+    transition: width 0.3s ease;
+}
