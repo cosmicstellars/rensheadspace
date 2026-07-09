@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TV Broadcasting - Yandere Online</title>
     
-    <script src="/coi-serviceworker.js"></script>
+    <script>
+    const coi = {
+        shouldRegister: () => true,
+        shouldDeregister: () => false,
+        coi: true
+    };
+</script>
+<script src="/coi-serviceworker.js"></script>
     
     <link rel="stylesheet" href="/yostyle.css?v=2"> 
     <link rel="icon" type="image/png" href="/img/Icon.png">
@@ -240,24 +247,24 @@
                     statusText.innerText = "Downloading Processing Engine...";
                     ffmpeg = new FFmpeg();
                     
+                    // Add these debug logs!
+                    console.log("Attempting to load FFmpeg...");
+                    
                     ffmpeg.on('progress', ({ progress }) => {
+                        console.log("Progress:", progress); // See if progress triggers in F12
                         const percent = Math.round(progress * 100);
                         progressBar.style.width = `${percent}%`;
                         statusText.innerText = `Compressing Video... ${percent}%`;
                     });
 
-                    const coreBaseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
-                    const ffmpegBaseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm';
-
                     await ffmpeg.load({
-                        // Pointing directly to the files you just uploaded to your repo
-await ffmpeg.load({
-    coreURL: '/ffmpeg-core.js',
-    wasmURL: '/ffmpeg-core.wasm',
-    classWorkerURL: '/worker.js'
-});
+                        coreURL: '/ffmpeg-core.js',
+                        wasmURL: '/ffmpeg-core.wasm',
+                        workerURL: '/worker.js' // Ensure it is 'workerURL', not 'classWorkerURL'
                     });
+                    console.log("FFmpeg loaded successfully!");
                 }
+                
 
                 statusText.innerText = "Reading video...";
                 progressBar.style.width = "0%";
