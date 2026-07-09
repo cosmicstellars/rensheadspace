@@ -105,7 +105,7 @@
 
     <script type="module">
         import { FFmpeg } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
-        import { fetchFile } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js';
+        import { fetchFile, toBlobURL } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js';
 
         const WORKER_URL = "https://tv-image-uploader.renmydearest.workers.dev";
         const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
