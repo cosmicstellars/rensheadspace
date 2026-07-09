@@ -257,11 +257,13 @@
                         statusText.innerText = `Compressing Video... ${percent}%`;
                     });
 
-                    await ffmpeg.load({
-                        coreURL: '/ffmpeg-core.js',
-                        wasmURL: '/ffmpeg-core.wasm',
-                        workerURL: '/worker.js' // Ensure it is 'workerURL', not 'classWorkerURL'
-                    });
+                    const baseUrl = window.location.origin;
+
+await ffmpeg.load({
+    coreURL: await toBlobURL(`${baseUrl}/ffmpeg-core.js`, 'text/javascript'),
+    wasmURL: await toBlobURL(`${baseUrl}/ffmpeg-core.wasm`, 'application/wasm'),
+    workerURL: await toBlobURL(`${baseUrl}/worker.js`, 'text/javascript')
+});
                     console.log("FFmpeg loaded successfully!");
                 }
                 
