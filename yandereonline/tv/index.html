@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TV Broadcasting - Yandere Online</title>
     
-    <link rel="stylesheet" href="/yostyle.css"> 
+    <link rel="stylesheet" href="/yostyle.css?v=1"> 
     <link rel="icon" type="image/png" href="/img/Icon.png">
 </head>
 <body>
@@ -16,24 +16,39 @@
             <img src="/yandereonline/img/Logo.png" alt="Yandere Online Logo">
         </header>
 
-        <main style="display: flex; flex-direction: column; gap: 20px;">
+        <nav class="cute-nav">
+            <a href="/">Home</a> 
+            <a href="/creations">Creations & OCs</a> 
+            <a href="/projects">Games & Dev</a> 
+        </nav>
+
+        <main class="main-content">
             
+            <!-- LEFT COLUMN: Upload Box -->
             <section class="cute-panel">
-                <h2>Upload Image for TV</h2>
+                <h2>Create TV Channel</h2>
                 <div class="upload-area">
-                    <p style="font-weight: 800; font-size: 16px;">Select an image to broadcast! (Max 2MB)</p>
-                    <input type="file" id="imageInput" accept="image/png, image/jpeg, image/webp" style="margin-bottom: 15px;">
+                    <p style="font-weight: 800; font-size: 16px; color: #ff69b4; margin-bottom: 5px;">1. Select Channel Image <br><span style="font-size: 12px; color: #888;">(Required • Max 2MB)</span></p>
+                    <input type="file" id="imageInput" accept="image/png, image/jpeg, image/webp" style="margin-bottom: 20px;">
+                    
+                    <p style="font-weight: 800; font-size: 16px; color: #ff69b4; margin-bottom: 5px; border-top: 2px dashed #ffe4e1; padding-top: 15px;">2. Add Channel Audio <br><span style="font-size: 12px; color: #888;">(Optional • Max 5MB)</span></p>
+                    <input type="file" id="audioInput" accept="audio/mpeg, audio/wav, audio/ogg" style="margin-bottom: 20px;">
+                    
                     <br>
-                    <button class="btn" id="uploadBtn" style="font-size: 16px; padding: 12px 25px;">Upload to Network</button>
+                    <button class="btn" id="uploadBtn" style="font-size: 16px; padding: 12px 25px;">Broadcast Channel</button>
                     <p id="statusMessage" style="display: none; margin-top: 15px; font-weight: 800;"></p>
                 </div>
             </section>
 
+            <!-- RIGHT COLUMN: Gallery Box -->
             <section class="cute-panel">
-                <h2>Your Uploaded Links</h2>
-                <p style="text-align: center; font-weight: 600;">These links are saved locally! Copy the link and paste it into the TV in-game.</p>
+                <h2>Your TV Channels</h2>
+                <p style="text-align: center; font-weight: 600; color: #666; margin-bottom: 20px;">
+                    Copy the Channel Link and paste it into the TV in-game!
+                </p>
                 <div class="gallery-grid" id="galleryContainer">
-                    </div>
+                    <!-- Javascript populates this -->
+                </div>
             </section>
 
         </main>
@@ -42,11 +57,13 @@
     <script>
         // --- CONFIGURATION ---
         const WORKER_URL = "https://tv-image-uploader.renmydearest.workers.dev";
-        const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-        const MAX_WIDTH = 1280; // Resize to 720p equivalent width
+        const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+        const MAX_AUDIO_SIZE = 5 * 1024 * 1024; // 5MB
+        const MAX_WIDTH = 1280; 
         const MAX_HEIGHT = 720;
 
         const imageInput = document.getElementById('imageInput');
+        const audioInput = document.getElementById('audioInput');
         const uploadBtn = document.getElementById('uploadBtn');
         const statusMessage = document.getElementById('statusMessage');
         const galleryContainer = document.getElementById('galleryContainer');
@@ -55,28 +72,34 @@
         renderGallery();
 
         uploadBtn.addEventListener('click', async () => {
-            const file = imageInput.files[0];
-            if (!file) {
-                showStatus("Please select a file first!", "#ff4d4d");
+            const imgFile = imageInput.files[0];
+            const audFile = audioInput.files[0];
+
+            if (!imgFile) {
+                showStatus("You must select an image for the channel!", "#ff4d4d");
                 return;
             }
 
-            if (file.size > MAX_FILE_SIZE) {
-                const wantToResize = confirm(`This image is larger than 2MB (${(file.size / 1024 / 1024).toFixed(2)}MB). Would you like to automatically resize and optimize it before uploading?`);
-                
+            if (audFile && audFile.size > MAX_AUDIO_SIZE) {
+                showStatus("Audio file is too large! Please keep it under 5MB.", "#ff4d4d");
+                return;
+            }
+
+            if (imgFile.size > MAX_IMAGE_SIZE) {
+                const wantToResize = confirm(`Image is larger than 2MB. Would you like to automatically resize and optimize it?`);
                 if (wantToResize) {
-                    showStatus("Optimizing image...", "#ff69b4");
-                    resizeAndUpload(file);
+                    showStatus("Optimizing image and uploading...", "#ff69b4");
+                    resizeAndUpload(imgFile, audFile);
                 } else {
-                    showStatus("Upload cancelled. File too large.", "#ff4d4d");
+                    showStatus("Upload cancelled. Image too large.", "#ff4d4d");
                 }
             } else {
-                showStatus("Uploading...", "#ff69b4");
-                uploadToServer(file);
+                showStatus("Uploading Channel to Network...", "#ff69b4");
+                uploadToServer(imgFile, audFile);
             }
         });
 
-        function resizeAndUpload(file) {
+        function resizeAndUpload(imgFile, audFile) {
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
@@ -103,45 +126,57 @@
                     ctx.drawImage(img, 0, 0, width, height);
 
                     canvas.toBlob((blob) => {
-                        const resizedFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
-                            type: 'image/jpeg',
-                            lastModified: Date.now()
-                        });
-                        uploadToServer(resizedFile);
+                        uploadToServer(blob, audFile);
                     }, 'image/jpeg', 0.85); 
                 }
                 img.src = event.target.result;
             }
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(imgFile);
         }
 
-        async function uploadToServer(fileToUpload) {
+        async function uploadToServer(imgData, audFile) {
             uploadBtn.disabled = true;
             
             try {
+                // We use FormData so we can send multiple files at once!
+                const formData = new FormData();
+                formData.append("image", imgData, "image.jpg");
+                
+                if (audFile) {
+                    formData.append("audio", audFile, audFile.name);
+                }
+
                 const response = await fetch(WORKER_URL, {
                     method: "POST",
-                    body: fileToUpload
+                    body: formData
                 });
 
                 if (!response.ok) throw new Error("Upload failed on server.");
 
                 const data = await response.json();
                 
-                const newImage = {
-                    url: data.url,
+                const newChannel = {
+                    channelUrl: data.channelUrl,     // The JSON link for the game
+                    imageUrl: data.imageUrl,         // The Image link for the preview
+                    audioUrl: audFile ? true : false, // Just to know if we should show an audio player
+                    cName: data.channelFileName,
+                    iName: data.imageFileName,
+                    aName: data.audioFileName,
                     date: new Date().toLocaleDateString()
                 };
-                uploadHistory.push(newImage);
+                
+                uploadHistory.push(newChannel);
                 localStorage.setItem('tvUploadHistory', JSON.stringify(uploadHistory));
 
-                showStatus("Upload successful!", "#333");
+                showStatus("Channel Broadcasted!", "#ff69b4");
                 renderGallery();
+                
                 imageInput.value = ""; 
+                audioInput.value = ""; 
 
             } catch (error) {
                 console.error(error);
-                showStatus("Error uploading image. Check console for details.", "#ff4d4d");
+                showStatus("Error uploading channel. Check console for details.", "#ff4d4d");
             } finally {
                 uploadBtn.disabled = false;
             }
@@ -155,42 +190,51 @@
                 
                 const div = document.createElement('div');
                 div.className = 'gallery-item';
-                div.innerHTML = `
-                    <img src="${item.url}" alt="TV Upload">
+                
+                let innerHtml = `<img src="${item.imageUrl}" alt="Channel Preview">`;
+                
+                if (item.audioUrl) {
+                    innerHtml += `<div style="font-size: 11px; color: #ff69b4; font-weight: bold; margin-bottom: 5px;">🎵 Audio Included</div>`;
+                }
+
+                innerHtml += `
                     <div class="date-text">${item.date}</div>
-                    <button class="btn" style="font-size: 11px; padding: 6px 10px;" onclick="copyLink('${item.url}')">Copy Link</button>
+                    <button class="btn" style="font-size: 11px; padding: 6px 10px;" onclick="copyLink('${item.channelUrl}')">Copy Link</button>
                     <button class="btn btn-delete" style="font-size: 11px; padding: 6px 10px;" onclick="deleteHistory(${i})">Delete</button>
                 `;
+                
+                div.innerHTML = innerHtml;
                 galleryContainer.appendChild(div);
             }
         }
 
         function copyLink(url) {
             navigator.clipboard.writeText(url).then(() => {
-                alert("Link copied! Paste this into the TV in-game.");
+                alert("Channel Link copied! Paste this into the TV in-game.");
             });
         }
 
         async function deleteHistory(index) {
-            const sure = confirm("Are you sure you want to permanently delete this image from the cloud?");
+            const sure = confirm("Are you sure you want to completely destroy this channel from the cloud?");
             
             if (sure) {
                 const item = uploadHistory[index];
-                const fileName = item.url.split('/').pop();
-
+                
                 try {
-                    showStatus("Deleting from cloud...", "#ff69b4");
+                    showStatus("Deleting channel from cloud...", "#ff69b4");
                     
-                    await fetch(`${WORKER_URL}?file=${fileName}`, {
-                        method: "DELETE"
-                    });
+                    // Tell Cloudflare to completely destroy the JSON, Image, and Audio files!
+                    let deleteUrl = `${WORKER_URL}?c=${item.cName}&i=${item.iName}`;
+                    if (item.aName) deleteUrl += `&a=${item.aName}`;
+
+                    await fetch(deleteUrl, { method: "DELETE" });
                     
-                    showStatus("Image permanently deleted.", "#333");
+                    showStatus("Channel permanently deleted.", "#ff69b4");
                     setTimeout(() => { statusMessage.style.display = "none"; }, 3000);
 
                 } catch (error) {
                     console.error("Failed to delete from cloud:", error);
-                    alert("Warning: Failed to delete the image from the cloud server.");
+                    alert("Warning: Failed to fully delete the channel from the cloud server.");
                 }
 
                 uploadHistory.splice(index, 1);
