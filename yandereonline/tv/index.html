@@ -253,22 +253,23 @@
         statusText.innerText = `Compressing Video... ${percent}%`;
     });
 
-    // Use CDN + toBlobURL (recommended way)
     const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
 
-    const [coreURL, wasmURL, workerURL] = await Promise.all([
-        toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-        toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript')
-    ]);
+const [coreURL, wasmURL, workerURL] = await Promise.all([
+    toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+    toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+    toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript')
+]);
+
+await ffmpeg.load({ coreURL, wasmURL, workerURL });
 
     await ffmpeg.load({
         coreURL,
         wasmURL,
         workerURL
-    }); 
+    });
 
-    console.log("FFmpeg loaded successfully from CDN!");
+    console.log("✅ FFmpeg loaded successfully!");
 }
                 
 
