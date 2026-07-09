@@ -51,7 +51,7 @@
                     <div id="videoInputs" class="hidden">
                         <p style="font-weight: 800; font-size: 16px; color: #ff69b4; margin-bottom: 5px;">
                             1. Add Video File <br>
-                            <span style="font-size: 12px; color: #888;">(Required • Max 10MB • Auto-generates thumbnail)</span>
+                            <span style="font-size: 12px; color: #888;">(Required • Max 20MB • Auto-generates thumbnail)</span>
                         </p>
                         <input type="file" id="videoInput" accept="video/mp4" style="margin-bottom: 20px;">
                     </div>
@@ -76,7 +76,7 @@
         const WORKER_URL = "https://tv-image-uploader.renmydearest.workers.dev";
         const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
         const MAX_AUDIO_SIZE = 5 * 1024 * 1024; // 5MB
-        const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB
+        const MAX_VIDEO_SIZE = 20 * 1024 * 1024; // 20MB
         const MAX_WIDTH = 1280; 
         const MAX_HEIGHT = 720;
 
@@ -314,7 +314,7 @@
                 if (!vidFile) return showStatus("You must select a video file!", "#ff4d4d");
 
                 if (vidFile.size > MAX_VIDEO_SIZE) {
-                    return showStatus("Video file is too large! Maximum allowed size is 10MB.", "#ff4d4d");
+                    return showStatus("Video file is too large! Maximum allowed size is 20MB.", "#ff4d4d");
                 }
 
                 try {
