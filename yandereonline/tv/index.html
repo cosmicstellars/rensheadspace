@@ -260,11 +260,11 @@
                     const baseUrl = window.location.origin;
 					
 					await ffmpeg.load({
-    coreURL: '/ffmpeg-core.js',
-    wasmURL: '/ffmpeg-core.wasm',
-    classWorkerURL: '/worker.js'
+    classWorkerURL: window.location.origin + "/worker.js",
+    coreURL: window.location.origin + "/ffmpeg-core.js",
+    wasmURL: window.location.origin + "/ffmpeg-core.wasm",
+    workerURL: window.location.origin + "/ffmpeg-core.worker.js",
 });
-
                     console.log("FFmpeg loaded successfully!");
                 }
                 
