@@ -173,13 +173,21 @@
             return new Promise((resolve, reject) => {
                 const video = document.createElement('video');
                 video.src = URL.createObjectURL(videoFile);
+                video.muted = true; // Helps bypass background loading restrictions
+                video.playsInline = true;
                 
-                video.currentTime = 1; 
+                // Wait for the browser to actually read the video's dimensions
+                video.addEventListener('loadedmetadata', () => {
+                    // Now that we have the width/height, jump to 1 second in
+                    video.currentTime = Math.min(1, video.duration || 1); 
+                });
 
                 video.addEventListener('seeked', () => {
                     const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
+                    
+                    // Failsafe in case metadata still fails
+                    canvas.width = video.videoWidth || 1280;
+                    canvas.height = video.videoHeight || 720;
                     
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -191,7 +199,10 @@
                     }, 'image/jpeg', 0.85); 
                 });
 
-                video.addEventListener('error', (e) => reject("Error generating thumbnail"));
+                video.addEventListener('error', (e) => {
+                    URL.revokeObjectURL(video.src);
+                    reject("Error generating thumbnail");
+                });
             });
         }
 
@@ -234,7 +245,10 @@
             
             try {
                 const formData = new FormData();
-                formData.append("image", imgData, "image.jpg");
+                
+                // FIX: Keep the original file extension so PNGs/WebPs don't break!
+                const imgFilename = imgData.name || "image.jpg";
+                formData.append("image", imgData, imgFilename);
                 
                 if (currentMode === 'static' && audFile) formData.append("audio", audFile, audFile.name);
                 if (currentMode === 'video' && vidFile) formData.append("video", vidFile, vidFile.name);
