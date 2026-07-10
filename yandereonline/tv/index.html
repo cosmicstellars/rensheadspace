@@ -107,7 +107,7 @@
                 document.getElementById('staticInputs').classList.add('hidden');
                 document.getElementById('videoInputs').classList.remove('hidden');
                 audioInput.value = ""; 
-                imageInput.value = ""; // Ensures invisible input is wiped clean
+                imageInput.value = ""; 
             }
         };
 
@@ -119,9 +119,14 @@
                 const div = document.createElement('div');
                 div.className = 'gallery-item';
                 
-                // Added a fallback for broken/missing images so the UI doesn't break
+                // THE FIX 1: If the worker didn't explicitly return imageUrl, piece it together manually
+                let finalImageUrl = item.imageUrl || '';
+                if (!finalImageUrl && item.iName) {
+                    finalImageUrl = `${WORKER_URL}/${item.iName}`;
+                }
+                
                 let innerHtml = `
-                    <img src="${item.imageUrl || ''}" 
+                    <img src="${finalImageUrl}" 
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
                          alt="Preview" 
                          style="width:100%; aspect-ratio: 16/9; object-fit: cover; border-radius:8px; margin-bottom:5px; background-color: #ffe4e1;">
@@ -179,23 +184,21 @@
             }
         };
 
+        // THE FIX 2: Bulletproof Video Thumbnail Generator
         function generateVideoThumbnail(videoFile) {
             return new Promise((resolve, reject) => {
                 const video = document.createElement('video');
                 video.src = URL.createObjectURL(videoFile);
-                video.muted = true; // Helps bypass background loading restrictions
+                video.muted = true; 
                 video.playsInline = true;
                 
-                // Wait for the browser to actually read the video's dimensions
-                video.addEventListener('loadedmetadata', () => {
-                    // Now that we have the width/height, jump to 1 second in
+                // loadeddata guarantees the first frame is actually ready to draw
+                video.addEventListener('loadeddata', () => {
                     video.currentTime = Math.min(1, video.duration || 1); 
                 });
 
                 video.addEventListener('seeked', () => {
                     const canvas = document.createElement('canvas');
-                    
-                    // Failsafe in case metadata still fails
                     canvas.width = video.videoWidth || 1280;
                     canvas.height = video.videoHeight || 720;
                     
@@ -204,8 +207,12 @@
                     
                     canvas.toBlob((blob) => {
                         URL.revokeObjectURL(video.src);
-                        const thumbFile = new File([blob], "auto_thumb.jpg", { type: "image/jpeg" });
-                        resolve(thumbFile);
+                        if (blob) {
+                            const thumbFile = new File([blob], "auto_thumb.jpg", { type: "image/jpeg" });
+                            resolve(thumbFile);
+                        } else {
+                            reject("Failed to generate blob.");
+                        }
                     }, 'image/jpeg', 0.85); 
                 });
 
@@ -213,6 +220,9 @@
                     URL.revokeObjectURL(video.src);
                     reject("Error generating thumbnail");
                 });
+
+                // Force the browser to start parsing the video file immediately
+                video.load(); 
             });
         }
 
@@ -256,7 +266,6 @@
             try {
                 const formData = new FormData();
                 
-                // FIX: Keep the original file extension so PNGs/WebPs don't break!
                 const imgFilename = imgData.name || "image.jpg";
                 formData.append("image", imgData, imgFilename);
                 
