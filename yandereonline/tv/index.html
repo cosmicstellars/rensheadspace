@@ -126,7 +126,7 @@ if (!finalImageUrl && item.iName) {
 }
 
 // NEW FIX: Add a unique timestamp so the browser never caches a broken image
-finalImageUrl += (finalImageUrl.includes('?') ? '&' : '?') + 'nocache=' + new Date().getTime();
+finalImageUrl += (finalImageUrl.includes('?') ? '&' : '?') + 'v=' + new Date().getTime();
                 
                 let innerHtml = `
                     <img src="${finalImageUrl}" 
