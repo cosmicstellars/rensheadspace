@@ -121,9 +121,12 @@
                 
                 // THE FIX 1: If the worker didn't explicitly return imageUrl, piece it together manually
                 let finalImageUrl = item.imageUrl || '';
-                if (!finalImageUrl && item.iName) {
-                    finalImageUrl = `${WORKER_URL}/${item.iName}`;
-                }
+if (!finalImageUrl && item.iName) {
+    finalImageUrl = `${WORKER_URL}/${item.iName}`;
+}
+
+// NEW FIX: Add a unique timestamp so the browser never caches a broken image
+finalImageUrl += (finalImageUrl.includes('?') ? '&' : '?') + 'nocache=' + new Date().getTime();
                 
                 let innerHtml = `
                     <img src="${finalImageUrl}" 
