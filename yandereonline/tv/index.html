@@ -129,7 +129,7 @@ if (!finalImageUrl && item.iName) {
 finalImageUrl += (finalImageUrl.includes('?') ? '&' : '?') + 'v=' + new Date().getTime();
                 
                 let innerHtml = `
-                    <img src="${finalImageUrl}" 
+                    <img crossorigin="anonymous" src="${finalImageUrl}"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
                          alt="Preview" 
                          style="width:100%; aspect-ratio: 16/9; object-fit: cover; border-radius:8px; margin-bottom:5px; background-color: #ffe4e1;">
