@@ -1,0 +1,276 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap');
+
+/* --- Modern Kawaii Pink Background --- */
+body {
+    background: linear-gradient(135deg, #fff0f5 0%, #ffb6c1 100%);
+    background-attachment: fixed;
+    color: #4a4a4a; /* Soft dark grey */
+    font-family: 'Nunito', sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* --- Main Layout Wrapper --- */
+.cute-container {
+    max-width: 1200px; /* Widened to support side-by-side layout */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* --- Header & Logo --- */
+.cute-header {
+    text-align: center;
+}
+.cute-header img {
+    max-width: 220px; /* Made the logo much smaller! */
+    height: auto;
+    filter: drop-shadow(0px 8px 15px rgba(255, 105, 180, 0.3));
+    transition: transform 0.3s ease;
+}
+.cute-header img:hover {
+    transform: scale(1.05); /* Cute bounce effect on hover */
+}
+
+/* --- Navigation --- */
+.cute-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+.cute-nav a {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #ff69b4;
+    text-decoration: none;
+    font-weight: 800;
+    padding: 10px 25px;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.15);
+    transition: all 0.2s ease;
+}
+.cute-nav a:hover {
+    background-color: #ff69b4;
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+    transform: translateY(-3px);
+}
+
+/* --- Side-by-Side Layout Grid --- */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr; /* Left column is smaller, right is wider */
+    gap: 30px;
+    align-items: start;
+}
+
+/* If the screen gets too small (like on a phone), stack them normally */
+@media (max-width: 850px) {
+    .main-content {
+        grid-template-columns: 1fr; 
+    }
+}
+
+/* --- Modern Glass Panels --- */
+.cute-panel {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(255, 182, 193, 0.5);
+    border: 2px solid #fff;
+}
+.cute-panel h2 {
+    color: #ff69b4;
+    margin-top: 0;
+    border-bottom: 2px solid #ffe4e1;
+    padding-bottom: 10px;
+    font-weight: 900;
+    font-size: 1.4rem;
+}
+
+/* --- Upload Area --- */
+.upload-area {
+    background-color: #fffafb;
+    border: 2px dashed #ffb6c1;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s;
+}
+.upload-area:hover {
+    background-color: #fff0f5;
+    border-color: #ff69b4;
+}
+
+/* --- Modern Bubble Buttons --- */
+.btn {
+    background-color: #ff69b4;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+    transition: all 0.2s;
+    margin: 5px;
+}
+.btn:hover {
+    background-color: #ff1493;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 20, 147, 0.4);
+}
+.btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(255, 20, 147, 0.3);
+}
+
+.btn-delete {
+    background-color: #ff4d4d;
+    box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+}
+.btn-delete:hover {
+    background-color: #e60000;
+    box-shadow: 0 6px 20px rgba(230, 0, 0, 0.4);
+}
+
+/* --- Image Gallery Grid --- */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+.gallery-item {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);
+    transition: transform 0.2s;
+}
+.gallery-item:hover {
+    transform: translateY(-5px);
+}
+.gallery-item img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.date-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+/* Custom Input File Button */
+input[type=file]::file-selector-button {
+    background-color: #ffe4e1;
+    border: none;
+    color: #ff69b4;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    margin-right: 15px;
+    transition: all 0.2s;
+}
+input[type=file]::file-selector-button:hover {
+    background-color: #ffb6c1;
+    color: #fff;
+}
+/* --- FFmpeg Modal Styles --- */
+.ffmpeg-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 192, 203, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.ffmpeg-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    border: 4px solid #ff69b4;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.ffmpeg-modal-content h2 {
+    color: #ff69b4;
+    margin-top: 0;
+    border-bottom: none;
+    font-size: 1.4rem;
+    font-weight: 900;
+}
+
+#ffmpegModalText {
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.ffmpeg-subtext {
+    font-size: 12px;
+    color: #888;
+}
+
+.ffmpeg-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-cancel {
+    background-color: #ccc;
+    box-shadow: 0 4px 15px rgba(200, 200, 200, 0.3);
+}
+
+.btn-cancel:hover {
+    background-color: #aaa;
+    box-shadow: 0 6px 20px rgba(170, 170, 170, 0.4);
+}
+
+.ffmpeg-progress-container {
+    display: none;
+    margin-top: 20px;
+}
+
+#ffmpegStatusText {
+    color: #ff69b4;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.ffmpeg-progress-bg {
+    width: 100%;
+    background: #ffe4e1;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+    border: 2px solid #ff69b4;
+}
+
+.ffmpeg-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #ff69b4;
+    transition: width 0.3s ease;
+}
