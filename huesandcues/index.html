@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hues & Cues - Web Edition</title>
+  <style>
+    :root {
+      --bg: #1e1e24;
+      --panel: #2b2d42;
+      --text: #edf2f4;
+      --accent: #ffb703;
+      --accent-hover: #ffa200;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 { margin-bottom: 5px; color: var(--accent); }
+    .subtitle { margin-bottom: 15px; color: #a0a0a0; font-size: 0.9rem; }
+
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .controls {
+      background: var(--panel);
+      padding: 15px 20px;
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .flow-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .card-display {
+      background: #3d405b;
+      padding: 12px 15px;
+      border-radius: 6px;
+      border: 2px dashed var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .swatch-wrapper {
+      position: relative;
+      width: 40px;
+      height: 40px;
+    }
+
+    .card-color-swatch {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      display: block;
+      background-color: #000;
+    }
+
+    /* Completely opaque cover over target color */
+    .color-cover {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      border-radius: 50%;
+      border: 2px solid #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .color-cover.revealed {
+      display: none;
+    }
+
+    .phase-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    button:hover { background: var(--accent-hover); }
+    button:disabled { background: #555; color: #888; cursor: not-allowed; }
+
+    .reveal-btn {
+      background: #4a4e69;
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 6px 10px;
+    }
+    .reveal-btn:hover { background: #6b705c; }
+
+    /* Spectrum Grid Setup */
+    .grid-wrapper {
+      overflow-x: auto;
+      background: var(--panel);
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(31, 26px);
+      gap: 2px;
+      user-select: none;
+    }
+
+    .cell {
+      width: 26px;
+      height: 26px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .cell.header {
+      background: transparent;
+      color: #a0a0a0;
+      font-weight: bold;
+      cursor: default;
+    }
+
+    .marker {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #000;
+      position: absolute;
+      box-shadow: 0 0 4px rgba(0,0,0,0.8);
+      pointer-events: none;
+      font-size: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .marker.target {
+      background: transparent;
+      border: 3px solid #fff;
+      box-shadow: 0 0 8px #000;
+      width: 22px;
+      height: 22px;
+    }
+
+    .scoreboard {
+      background: var(--panel);
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .scoring-rules {
+      font-size: 0.85rem;
+      color: #ccc;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Hues &amp; Cues</h1>
+  <div class="subtitle">Custom Verbal Hint Edition</div>
+
+  <div class="game-container">
+    <div class="controls">
+      <div class="flow-section">
+        <div>
+          <button id="draw-card-btn">1. Draw Cue Color</button>
+          <button id="hint-1-btn" disabled>2. Start 1st Hint (1 Word)</button>
+          <button id="hint-2-btn" disabled>3. Start 2nd Hint (1-2 Words)</button>
+        </div>
+
+        <div class="card-display" id="card-display" style="display: none;">
+          <div>
+            <span>Target: <strong id="target-id-text">--</strong></span>
+            <div style="margin-top: 4px;">
+              <button id="peek-btn" class="reveal-btn">Hold to Peek Target</button>
+            </div>
+          </div>
+          <div class="swatch-wrapper">
+            <span class="card-color-swatch" id="target-swatch"></span>
+            <div class="color-cover" id="color-cover">?</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+        <div>
+          Status: <span id="round-status" class="phase-badge">Setup</span>
+        </div>
+        <div>
+          <button id="score-btn" disabled>Calculate Scores</button>
+          <button id="reset-btn">New Round</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-wrapper">
+      <div class="board-grid" id="board"></div>
+    </div>
+
+    <div class="scoreboard">
+      <h3>Round Status</h3>
+      <p id="results-text">Click "Draw Cue Color" to begin a round.</p>
+      <div class="scoring-rules">
+        <strong>Scoring:</strong> Exact Match = 3 pts | Adjacent 1-step = 2 pts | Outer Frame (2-step) = 1 pt
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ROWS = 16;
+    const COLS = 30;
+    
+    let targetCoords = null;
+    let guesses = [];
+    let isScored = false;
+
+    const board = document.getElementById('board');
+    const drawBtn = document.getElementById('draw-card-btn');
+    const hint1Btn = document.getElementById('hint-1-btn');
+    const hint2Btn = document.getElementById('hint-2-btn');
+    const scoreBtn = document.getElementById('score-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const peekBtn = document.getElementById('peek-btn');
+    
+    const cardDisplay = document.getElementById('card-display');
+    const targetIdText = document.getElementById('target-id-text');
+    const targetSwatch = document.getElementById('target-swatch');
+    const colorCover = document.getElementById('color-cover');
+    
+    const roundStatus = document.getElementById('round-status');
+    const resultsText = document.getElementById('results-text');
+
+    function getCellColor(row, col) {
+      const hue = (col / COLS) * 360;
+      let saturation = 100;
+      let lightness = 50;
+
+      if (row < 8) {
+        lightness = 85 - (row * 4.5);
+      } else {
+        saturation = 100 - ((row - 7) * 8);
+        lightness = 50 - ((row - 7) * 2.5);
+      }
+
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
+    function initBoard() {
+      board.innerHTML = '';
+      
+      const corner = document.createElement('div');
+      corner.className = 'cell header';
+      board.appendChild(corner);
+
+      for (let c = 1; c <= COLS; c++) {
+        const colHeader = document.createElement('div');
+        colHeader.className = 'cell header';
+        colHeader.innerText = c;
+        board.appendChild(colHeader);
+      }
+
+      for (let r = 0; r < ROWS; r++) {
+        const rowLabel = String.fromCharCode(65 + r);
+        
+        const rowHeader = document.createElement('div');
+        rowHeader.className = 'cell header';
+        rowHeader.innerText = rowLabel;
+        board.appendChild(rowHeader);
+
+        for (let c = 1; c <= COLS; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.style.backgroundColor = getCellColor(r, c);
+
+          cell.addEventListener('click', () => handleCellClick(r, c, cell));
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    // 1. Draw Cue Card
+    drawBtn.addEventListener('click', () => {
+      const randomRow = Math.floor(Math.random() * ROWS);
+      const randomCol = Math.floor(Math.random() * (COLS - 1)) + 1;
+      const rowLabel = String.fromCharCode(65 + randomRow);
+      
+      targetCoords = { r: randomRow, c: randomCol, id: `${rowLabel}${randomCol}` };
+      const color = getCellColor(randomRow, randomCol);
+
+      targetIdText.innerText = targetCoords.id;
+      targetSwatch.style.backgroundColor = color;
+      
+      cardDisplay.style.display = 'flex';
+      colorCover.classList.remove('revealed');
+      
+      drawBtn.disabled = true;
+      hint1Btn.disabled = false;
+      roundStatus.innerText = "Cue Giver Ready";
+      resultsText.innerText = 'Cue Giver: Hold "Hold to Peek Target" to check your secret color, then say your 1st hint out loud and click "Start 1st Hint".';
+    });
+
+    // Hold-to-reveal target swatch
+    const showTarget = () => colorCover.classList.add('revealed');
+    const hideTarget = () => {
+      if (!isScored) colorCover.classList.remove('revealed');
+    };
+
+    peekBtn.addEventListener('mousedown', showTarget);
+    peekBtn.addEventListener('mouseup', hideTarget);
+    peekBtn.addEventListener('mouseleave', hideTarget);
+    peekBtn.addEventListener('touchstart', showTarget);
+    peekBtn.addEventListener('touchend', hideTarget);
+
+    // 2. Hint 1 Phase
+    hint1Btn.addEventListener('click', () => {
+      hint1Btn.disabled = true;
+      hint2Btn.disabled = false;
+      scoreBtn.disabled = false;
+      roundStatus.innerText = "Hint 1 (Guessing)";
+      resultsText.innerText = 'Hint 1 Active! Cue Giver says 1 word out loud. Each guesser places 1 marker on the board. When ready, click "Start 2nd Hint".';
+    });
+
+    // 3. Hint 2 Phase
+    hint2Btn.addEventListener('click', () => {
+      hint2Btn.disabled = true;
+      roundStatus.innerText = "Hint 2 (Guessing)";
+      resultsText.innerText = 'Hint 2 Active! Cue Giver says 1-2 words out loud. Each guesser places a 2nd marker. Once all guesses are in, click "Calculate Scores".';
+    });
+
+    // Handle board marker clicks
+    function handleCellClick(r, c, cellElement) {
+      if (isScored || !targetCoords) return;
+
+      const guessObj = { r, c, id: `${String.fromCharCode(65 + r)}${c}` };
+      guesses.push(guessObj);
+
+      const marker = document.createElement('div');
+      marker.className = 'marker';
+      marker.innerText = guesses.length;
+      cellElement.appendChild(marker);
+    }
+
+    // 4. Score Calculation
+    scoreBtn.addEventListener('click', () => {
+      if (!targetCoords || guesses.length === 0) return;
+
+      isScored = true;
+      scoreBtn.disabled = true;
+      hint1Btn.disabled = true;
+      hint2Btn.disabled = true;
+      
+      // Permanently unveil target color swatch
+      colorCover.classList.add('revealed');
+      roundStatus.innerText = "Scoring Complete";
+
+      // Highlight target cell on the grid
+      const targetCell = Array.from(document.querySelectorAll('.cell')).find(
+        el => el.dataset.row == targetCoords.r && el.dataset.col == targetCoords.c
+      );
+
+      if (targetCell) {
+        const targetMarker = document.createElement('div');
+        targetMarker.className = 'marker target';
+        targetCell.appendChild(targetMarker);
+      }
+
+      let totalPoints = 0;
+      let summary = [];
+
+      guesses.forEach((g, idx) => {
+        const rowDiff = Math.abs(g.r - targetCoords.r);
+        const colDiff = Math.abs(g.c - targetCoords.c);
+        const distance = Math.max(rowDiff, colDiff);
+
+        let points = 0;
+        if (distance === 0) points = 3;
+        else if (distance === 1) points = 2;
+        else if (distance === 2) points = 1;
+
+        totalPoints += points;
+        summary.push(`G${idx + 1} (${g.id}): ${points} pts`);
+      });
+
+      resultsText.innerHTML = `
+        <strong>Target revealed: ${targetCoords.id}</strong><br>
+        ${summary.join(' | ')} <br>
+        <em>Total Guessing Points Awarded: ${totalPoints}</em>
+      `;
+    });
+
+    function clearBoard() {
+      document.querySelectorAll('.marker').forEach(m => m.remove());
+      guesses = [];
+      isScored = false;
+      
+      drawBtn.disabled = false;
+      hint1Btn.disabled = true;
+      hint2Btn.disabled = true;
+      scoreBtn.disabled = true;
+      
+      cardDisplay.style.display = 'none';
+      colorCover.classList.remove('revealed');
+      
+      targetCoords = null;
+      roundStatus.innerText = "Setup";
+      resultsText.innerText = 'Click "Draw Cue Color" to begin a round.';
+    }
+
+    resetBtn.addEventListener('click', clearBoard);
+
+    initBoard();
+  </script>
+</body>
+</html>
